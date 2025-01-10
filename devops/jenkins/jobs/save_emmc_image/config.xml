@@ -1,21 +1,24 @@
-<?xml version="1.1" encoding="UTF-8" standalone="no"?><project>
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
   <actions/>
-  <description>Creates a factory settings image from for connected BBB.&#13;
-- create a grep sdcard&#13;
-- start BBB on grep mode&#13;
-- restart BBB on normal more&#13;
-- backup grepped image&#13;
-- apply process_raw_image.sh and create_sdcard.sh scripts&#13;
-- exports the sdcard as an image file&#13;
+  <description>Creates a factory settings image from for connected BBB.&#xd;
+- create a grep sdcard&#xd;
+- start BBB on grep mode&#xd;
+- restart BBB on normal more&#xd;
+- backup grepped image&#xd;
+- apply process_raw_image.sh and create_sdcard.sh scripts&#xd;
+- exports the sdcard as an image file&#xd;
 </description>
   <keepDependencies>false</keepDependencies>
   <properties>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.481.vcb_b_384a_3de89">
+      <optOut>false</optOut>
+    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
-          <description/>
-          <defaultValue>10.0.100.240</defaultValue>
+          <defaultValue>192.168.81.38</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -23,7 +26,7 @@
           <description>The folder where to host download file. 
 Apache server: /var/www/html/download
 or 
-Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
+Nginx (as on 192.168.81.39): /usr/share/nginx/html/download
 </description>
           <defaultValue>/usr/share/nginx/html/download</defaultValue>
           <trim>false</trim>
@@ -31,26 +34,26 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
         <hudson.model.StringParameterDefinition>
           <name>download_prefix</name>
           <description>Download server url. Example: http://10.0.1.20/download</description>
-          <defaultValue>http://10.0.1.20/download</defaultValue>
+          <defaultValue>http://192.168.81.39/download</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>sdcard_filename</name>
           <description>sdcard default filename</description>
-          <defaultValue/>
+          <defaultValue>sdcard_test</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>output_image_prefix</name>
           <description>Class of the upgrade image generated during this process. Could be empty, kernel44, kernel49, kernel 41, kernel 38, allthirdparty, or release.
 </description>
-          <defaultValue>fresh</defaultValue>
+          <defaultValue>test_</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>no_factorysettings_sdcard</name>
           <description>No factory settings sdcard image created if this paramter is checked.</description>
-          <defaultValue>true</defaultValue>
+          <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>build_branch</name>
@@ -66,9 +69,10 @@ Nginx (as on 10.0.1.20): /usr/share/nginx/html/download
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
-    
   </properties>
   <scm class="hudson.scm.NullSCM"/>
+  <quietPeriod>3</quietPeriod>
+  <scmCheckoutRetryCount>2</scmCheckoutRetryCount>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
@@ -88,7 +92,7 @@ df -h
 #the block device of the created factory settings sdcard: You can say:
 #/dev/sdb to write directly to a physical sdcard.
 #or /tmp/sdcard_image.img to export a factory settings sdcard image.
-#tmp_output_sdcard=/tmp/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img
+#tmp_output_sdcard=/tmp/save/${BUILD_NUMBER}/sdcard_${BUILD_NUMBER}.img
 
 echo user: $(whoami)
 
@@ -108,7 +112,7 @@ else
 	cat &lt;&lt;EOF &gt;&gt; ~/.ssh/config
 Host $build_machine
 		KexAlgorithms +diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-		Ciphers +3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+#		Ciphers +3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
 #		KexAlgorithms +diffie-hellman-group1-sha1
 #        KexAlgorithms +curve25519-sha256@libssh.org
 #        KexAlgorithms +ecdh-sha2-nistp256
@@ -117,6 +121,8 @@ Host $build_machine
 #        KexAlgorithms +diffie-hellman-group-exchange-sha256
 #        KexAlgorithms +diffie-hellman-group14-sha1
 EOF
+     echo patching done
+     cat ~/.ssh/config
 fi
 
 #if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
@@ -131,30 +137,29 @@ fi
 #	sudo service sshd restart
 #fi
 
-ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R $build_machine
-
 #echo deleting root password in case of chaipcr
 #sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine "passwd -d -u root"
 
 ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R $build_machine
+ssh-keygen -f "/home/jenkins/.ssh/known_hosts" -R $build_machine
+
+#ssh-keyscan $build_machine &gt;&gt; /home/jenkins/.ssh/known_hosts
+
 sshpass -p chaipcr ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;'ENDSSH'
 
-if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
+if grep -q diffie-hellman-group1-sha1 /etc/ssh/sshd_config
 then
 	echo sshd_config on $build_machine was patched already
 else
 	echo patching sshd_config
-    
+
 	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
 		KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-		Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
-	EOF
+EOF
 	ssh-keygen -A || true
+    service sshd restart || service ssh restart || /etc/init.d/ssh restart
 
-	sudo service sshd restart
-    sudo service ssh restart
-    /etc/init.d/ssh restart
-	echo $build_machine patched
+	echo $build_machine patched successfully
     ifconfig
 fi
 
@@ -230,7 +235,7 @@ ls
 </command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
       <siteName>root@$build_machine:22</siteName>
       <command>echo "Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}"
 echo "Slave Beaglebone at ${build_machine}"
@@ -267,13 +272,13 @@ sync
 sleep 60
 sync
 lsof
-umount /dev/mmcblk0p* -v
+umount /dev/mmcblk0p* -v || true
 sleep 60
 umount /dev/mmcblk0* -f -v || true
-umount /sdcard/* -f -v
+umount /sdcard/* -f -v || true
 
 lsblk
-if mount | grep mmcblk0
+if mount | grep -q mmcblk0
 then
   echo "Error: can't unmount sdcard!"
   exit 1
@@ -292,6 +297,7 @@ do
         fi
 done
 
+echo closing common unused processes
 pkill ruby2.3 
 pkill mysqld
 pkill julia
@@ -374,7 +380,15 @@ else
      exit 1
 fi
 
-lsblk</command>
+lsblk
+
+if [ -e ~/restore_history.log ]
+then
+    echo clearing previous restore history
+    rm ~/restore_history.log
+fi
+
+</command>
       <execEachLine>false</execEachLine>
       <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
@@ -389,7 +403,7 @@ sshpass -p chaipcr scp -r devops/grabimage_sdcard/uEnv.sdcard.txt root@$build_ma
 </command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
       <siteName>root@$build_machine:22</siteName>
       <command>echo patching grep sdcard to boot only once
 sed "s/reboot/rm \/mnt\/uEnv.txt ; reboot/" -i /tmp/grep_sdcard/autorun.sh
@@ -430,7 +444,7 @@ echo timeout waiting for the device to become ready!
 exit 1</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
       <siteName>root@$build_machine:22</siteName>
       <command>echo mounting result grep sdcard
 
@@ -461,8 +475,8 @@ mount /dev/mmcblk0p1 /tmp/grep_sdcard
     <hudson.tasks.Shell>
       <command>echo fetching eMMC image.
 stamp=$(date '+%Y%M%d%H%m%S')
-grep_sdcard_dir="/tmp/${BUILD_NUMBER}/emmc_inbox_${stamp}"
-tmp_sdcard_dir="/tmp/${BUILD_NUMBER}/sdcard_${stamp}"
+grep_sdcard_dir="/tmp/save/${BUILD_NUMBER}/emmc_inbox_${stamp}"
+tmp_sdcard_dir="/tmp/save/${BUILD_NUMBER}/sdcard_${stamp}"
 
 echo grep sdcard folder [input]: $grep_sdcard_dir
 mkdir -p "${grep_sdcard_dir}"
@@ -556,7 +570,7 @@ then
 	echo backup eMMC image to $full_emmc_image
     tar zfvc $full_emmc_image /tmp/image_creator/eMMC.img
     sdcard_url=${download_prefix}/$sdcard_filename
-	tmp_output_sdcard=/tmp/${BUILD_NUMBER}/$sdcard_filename
+	tmp_output_sdcard=/tmp/save/${BUILD_NUMBER}/$sdcard_filename
 
 #	cp $full_emmc_image $emmc_image_latest_compressed_full_local_path
 
@@ -654,6 +668,6 @@ exit 0</command>
     </hudson.plugins.summary__report.ACIPluginPublisher>
   </publishers>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.11.6"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.28"/>
   </buildWrappers>
 </project>
