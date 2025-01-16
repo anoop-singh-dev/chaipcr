@@ -1,0 +1,82 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Build Chaibio shoftware</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.481.vcb_b_384a_3de89">
+      <optOut>false</optOut>
+    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>build_machine</name>
+          <description>Building machine</description>
+          <defaultValue>192.168.81.32</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>is_dev</name>
+          <description>Build a development image.</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo install wifi firmware
+apt-get -y install firmware-realtek || sleep 200 &amp;&amp; apt-get -y install firmware-realtek || exit 1
+ 
+echo Build/install LCD drivers
+# this needs some optimization.. it takes 90MB
+apt-get  -y -q install device-tree-compiler || exit 1
+cd ~/chaipcr/modules/LCDtouch_V3/49
+chmod 775 install_debian.sh
+
+mkdir -p /boot/dts/
+mkdir -p /lib/firmware/
+
+./install_debian.sh || exit 1
+if [ -e /root/chaipcr/deploy/setup_touchcontroller.sh ]
+then
+     echo &quot;Setting up touch driver&quot;
+     /root/chaipcr/deploy/setup_touchcontroller.sh
+fi
+
+if $is_dev
+then
+      echo Building a debug image
+else
+      apt-get  -y -q --purge autoremove device-tree-compiler
+      rm -r /root/chaipcr/modules  2&gt; /dev/null
+      rm -r /root/chaipcr/deploy/overlay  2&gt; /dev/null
+fi
+
+modprobe -i tilcdc || exit 1
+echo done installing LCD driver.
+
+sync
+sync
+fsck /dev/mmcblk1p1 -y -f
+fsck /dev/mmcblk0p1 -y -f
+
+exit 0</command>
+      <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.28"/>
+  </buildWrappers>
+</project>

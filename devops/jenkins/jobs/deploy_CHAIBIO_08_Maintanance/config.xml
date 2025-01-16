@@ -1,0 +1,109 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Build Chaibio shoftware #7</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.481.vcb_b_384a_3de89">
+      <optOut>false</optOut>
+    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>build_machine</name>
+          <description>Building machine</description>
+          <defaultValue>192.168.81.32</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo Maintenance
+df -h
+export RAILS_ENV=production
+
+echo &quot;processing website&quot;
+cd /root/chaipcr/web
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get --yes --force-yes -o Dpkg::Options::=&quot;--force-confdef&quot; -o Dpkg::Options::=&quot;--force-confold&quot; -q update
+dpkg --configure -a --force-confdef --force-confold
+
+apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data || true
+apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data || true
+
+apt-get --yes --allow-change-held-packages -o Dpkg::Options::=&quot;--force-confdef&quot; -o Dpkg::Options::=&quot;--force-confold&quot; -q install tzdata
+
+echo &quot;Downgrade bundler to less than 2.0.0&quot;
+	yes | gem uninstall bundler -I -x -q -a -v &quot;&gt;2.0.0&quot; || true
+	gem install bundler -v &quot;~&gt;1.8.0, &lt;2.0.0&quot; || true
+	gem install pkg-config -v &quot;~&gt; 1.1&quot;
+	sudo apt-get install -q -y libxslt-dev libxml2-dev
+	export NOKOGIRI_USE_SYSTEM_LIBRARIES=1
+
+bundle install
+
+echo &quot;processing website..&quot;
+gem install bcrypt -v &apos;3.1.11&apos;
+
+#echo &quot;processing website...&quot;
+#systemctl enable r.service
+
+echo Setup Rails app
+mkdir -p ~/chaipcr/web/config/
+cat &lt;&lt;EOF &gt;&gt; ~/chaipcr/web/config/database.yml
+    production:
+      adapter: mysql2
+      database: chaipcr
+      pool: 5
+      timeout: 5000
+      username: root
+      password:
+EOF
+echo database.yml created
+
+cd /root/chaipcr/web
+chmod 755 /root
+
+echo bundle
+echo &quot;\n&quot; | bundle
+
+echo rake setup
+echo &quot;\n&quot; | RAILS_ENV=production bundle exec rake db:setup
+
+echo seed_fu
+echo &quot;\n&quot; | RAILS_ENV=production bundle exec rake db:seed_fu 
+
+# repeated no use those lines?
+echo Rails init
+cd ~/chaipcr/web
+bundle install
+gem install bcrypt -v &apos;3.1.11&apos;
+echo done rserev
+
+echo running db migrate script
+bundle exec rake db:migrate --trace # migrates database as needed
+
+df -h
+
+exit 0</command>
+      <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.28"/>
+  </buildWrappers>
+</project>

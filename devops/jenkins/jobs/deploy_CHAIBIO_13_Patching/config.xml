@@ -1,0 +1,142 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Build Chaibio shoftware</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.481.vcb_b_384a_3de89">
+      <optOut>false</optOut>
+    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>build_machine</name>
+          <description>Building machine</description>
+          <defaultValue>192.168.81.32</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo checking deployed web files
+ls -ahl
+if [ -e ~/chaipcr/deploy ]
+then
+	echo web files deploy done successfully
+else
+        echo error deploying ssh files
+        exit 1
+fi
+
+#Replace uEnv.txt
+echo Replacing uEnv.txt
+cd ~/chaipcr/deploy/
+./replace_uEnv.txt.sh
+#sed -i &quot;s/errors=remount-ro/errors=continue/&quot; /etc/fstab
+
+echo patching rc.local
+cd /etc
+#if [ ! -e rc.local ]
+#then
+    echo &quot;Overwriting rc.local.&quot;
+    cat &gt; rc.local &lt;&lt; EOF
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will &quot;exit 0&quot; on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+exit 0
+
+EOF
+chmod +x rc.local
+#fi
+
+cd /etc        
+patch -i ~/chaipcr/deploy/device/rc.local.patch  || (echo error patching rc.local)
+cd
+sync
+
+echo Disable Mass-storage mini-usb
+cd /opt/scripts/boot        || exit 1
+patch -i ~/chaipcr/deploy/device/storage.disable.patch  || (echo error adding storage disable patch &amp;&amp; exit 1)
+cd ~
+sync
+
+echo Update Networking
+sed -i &apos;s/#auto eth0/auto eth0/&apos; /etc/network/interfaces
+sed -i &apos;s/#iface eth0/iface eth0/&apos; /etc/network/interfaces
+
+cp /etc/dhcp/dhclient.conf /etc/dhcp/dhclient.conf.bak
+#sed -i &apos;s/#timeout 60/timeout 20/&apos; /etc/dhcp/dhclient.conf
+#sed -i &apos;s/#retry 60/retry 20/&apos; /etc/dhcp/dhclient.conf
+sed -i &apos;s/#reboot/reboot/&apos; /etc/dhcp/dhclient.conf
+
+echo Disabling usb1
+cd /opt/scripts/boot        || exit 1
+
+[ -e temp.patch ] &amp;&amp; rm temp.patch
+cat &gt;&gt; temp.patch &lt;&lt; EOF
+--- am335x_evm.sh       2018-10-04 15:06:36.889361025 +0200
++++ am335x_evm.sh       2018-10-04 15:06:26.649444094 +0200
+@@ -682,17 +682,17 @@
+ compare_major=&quot;4&quot;
+ compare_minor=&quot;4&quot;
+
+-if [ &quot;\${kernel_major}&quot; -lt &quot;\${compare_major}&quot; ] ; then
++#if [ &quot;\${kernel_major}&quot; -lt &quot;\${compare_major}&quot; ] ; then
+ 	use_old_g_multi
+-elif [ &quot;\${kernel_major}&quot; -eq &quot;\${compare_major}&quot; ] ; then
+-	if [ &quot;\${kernel_minor}&quot; -lt &quot;\${compare_minor}&quot; ] ; then
+-		use_old_g_multi
+-	else
+-		use_libcomposite
+-	fi
+-else
+-	use_libcomposite
+-fi
++#elif [ &quot;\${kernel_major}&quot; -eq &quot;\${compare_major}&quot; ] ; then
++#	if [ &quot;\${kernel_minor}&quot; -lt &quot;\${compare_minor}&quot; ] ; then
++#		use_old_g_multi
++#	else
++#		use_libcomposite
++#	fi
++#else
++#	use_libcomposite
++#fi
+ 
+ if [ -f /var/lib/misc/dnsmasq.leases ] ; then
+ 	systemctl stop dnsmasq || true
+EOF
+
+patch -i temp.patch  || (echo error adding usb1 patch &amp;&amp; exit 1)
+rm temp.patch
+
+exit 0</command>
+      <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.28"/>
+  </buildWrappers>
+</project>

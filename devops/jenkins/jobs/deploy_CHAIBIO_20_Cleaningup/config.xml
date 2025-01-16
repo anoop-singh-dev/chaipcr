@@ -1,0 +1,287 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Build Chaibio shoftware</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.481.vcb_b_384a_3de89">
+      <optOut>false</optOut>
+    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>build_machine</name>
+          <description>Building machine</description>
+          <defaultValue>192.168.81.32</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>is_dev</name>
+          <description>Build a development image.</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo closing swap file
+sync
+swapoff -a
+/sbin/swapoff  -a
+
+echo clearing more space
+apt-get -q -y --fix-broken install
+rm /sdcard/factory/swapfile 
+cd
+
+if $is_dev
+then
+      echo Building a debug image
+      touch /etc/development_build.flag
+      if [ -e /etc/bypassjulia.flag ]
+      then
+          echo  Bypass julia build
+      else
+            echo &quot;/dev/mmcblk0p2  /root/.julia  ext4  noatime,errors=remount-ro  0  1&quot;&gt;&gt;/etc/fstab
+      fi
+      exit 0
+fi
+
+# remove folders that are needed for the production image. An extra chance to freeup more space is by linking realtime and the browser statically.
+rm -r /opt/QtEmbedded/bin/  /opt/QtEmbedded/mkspecs /opt/QtEmbedded/include
+
+find . -name .git -execdir rm -r {} \;
+find . -name *.o  -exec rm {} \;
+find / -name .git -execdir rm -r {} \;
+rm -r /var/cache/apt /var/log/ /opt/QtEmbedded/imports /opt/QtEmbedded/translations /opt/QtEmbedded/include /opt/QtEmbedded/tests /opt/QtEmbedded/mkspecs ~/julia ~/lib
+mkdir /var/log/ -p
+find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
+sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes -o Dpkg::Options::=swi&quot;--force-confdef&quot; -o Dpkg::Options::=&quot;--force-confold&quot; -q update
+sudo dpkg --configure -a --force-confdef --force-confold
+
+
+exit 0</command>
+      <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo cleanup to free up some space
+df -h
+if $is_dev
+then
+      echo Building a debug image
+      exit 0
+fi
+
+# should be safe to remove the following: [only 5M save]
+#cd /opt/QtEmbedded/lib
+#rm libQtMultimedia* libQtDeclarative* libQtScriptTools* libQtSql* libQtSv* libQtTest* libQtXml* libQtScript*
+
+for retryloop in 1 2 3
+do
+echo removing headers...
+uname=`uname -r`
+echo uname=$uname
+uname_updated=$(echo &quot;$uname&quot; | sed &quot;s/chai-//&quot;)
+echo updated to $uname_updated
+apt-get  -y -q --purge autoremove linux-headers-$uname_updated || exit 1
+rm -r /usr/src/linux-headers-`uname -r`
+
+apt-get  -y -q --purge autoremove g++-4.7 g++-4.8 gcc-4.8 g++-4.8 gcc-4.8 g++-4.8 
+apt-get  -y -q --purge autoremove parted automake build-essential cmake device-tree-compiler g++ gfortran git i2c-tools libarpack2 libedit-dev libfftw3-dev libfftw3-double3 libfftw3-single3 libfontconfig1-dev libfreetype6-dev libgfortran3 libgfortran3 libgmp3-dev liblapack3 liblapack3gf libllvm3.8 libmetis5 libmpfr-dev libopenblas-base libopenblas-dev libqt4-webkit libssl-dev libtool libunwind8 libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxml2-dev libxrandr-dev libxrender-dev libxslt-dev lsb-release m4 nodejs pkg-config python unzip
+export DEBIAN_FRONTEND=noninteractive
+apt-get install -y -q liblapack-dev 
+apt-get  install -y -q -o DPkg::Options::=&quot;--force-confnew&quot; libts-bin
+apt-get -f  -y -q install
+
+apt-get  -y -q --purge autoremove fakeroot 
+apt-get -f  -y -q install
+
+apt-get --purge  -y -q autoremove g++
+apt-get  -y -q --purge autoremove gcc 
+apt-get  -y -q -f install
+
+apt-get  -y -q --purge autoremove gfortran* git i2c-tools 
+apt-get  -y -q --purge autoremove icu-devtools
+apt-get -y -q remove qt4-default qt5-default gettext
+#DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge libgtk-3-0
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge gcc-4.9 cmake
+DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge python2*
+
+apt-get autoremove -y --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
+
+apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data
+
+df -h
+done
+
+DEBIAN_FRONTEND=noninteractive apt-get -q -y install gettext
+apt-get -y -q install libpango1.0-0 libglib2.0-0 libcairo2
+apt-get -q -y install libboost-chrono-dev libboost-system-dev
+if [ -e /etc/bypassjulia.flag ]
+then
+    echo Julia is not installed
+else
+    apt-get -q -y install hdf5-tools
+    apt-get install -q -y libcholmod3 libblas-dev  libblas-common || true
+fi
+
+df -h
+
+rm /data/dot_julia*
+echo Adding USB shutdown script
+
+cat &gt; /uEnv.txt &lt;&lt; EOF
+# Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. check at ${BUILD_URL}
+
+shutdown_usb_power=i2c dev 0;i2c mw 0x24 1 0xec
+uenvcmd=echo Shutting down USB powered devices.;run shutdown_usb_power
+
+EOF
+
+echo removing build monitoring logs
+if [ -e /var/log/monitor_cpu.log ]
+then
+       rm /var/log/monitor_cpu.log
+fi
+if [ -e /var/log/monitor_cpu_main.log ]
+then
+       rm /var/log/monitor_cpu_main.log
+fi
+
+exit 0</command>
+      <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo zeroing 2
+
+dd if=/dev/zero of=/zeros.bigfile bs=16M
+sync
+rm /zeros.bigfile
+sync
+mkdir -p /tmp/zeroer
+if mount /dev/mmcblk1p2 /tmp/zeroer
+then
+    dd if=/dev/zero of=/tmp/zeroer/zeros.bigfile bs=16M
+    sync
+    rm /tmp/zeroer/zeros.bigfile
+    sync
+    umount /tmp/zeroer
+fi
+
+if mount /dev/mmcblk1p3 /tmp/zeroer
+then
+    dd if=/dev/zero of=/tmp/zeroer/zeros.bigfile bs=16M
+    sync
+    rm /tmp/zeroer/zeros.bigfile
+    sync
+    umount /tmp/zeroer
+fi
+
+echo basic beaglebone setup done!</command>
+      <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo changing root password to chaipcr and disabling login prompt on console
+sudo systemctl disable getty@tty1.service
+echo &quot;root:chaipcr&quot; | chpasswd
+sync
+echo starting time sync
+service ntp start
+
+echo limiting paging area for VM
+echo &quot;vm.min_free_kbytes=65536&quot; &gt;&gt; /etc/sysctl.conf
+
+echo rebooting
+shutdown -r 1
+echo a reboot is scheduled after a minute</command>
+      <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+sleep 60
+echo waiting for a restart
+for i in {0..300..60}
+do
+	echo &quot;Waiting for the build device to become ready! $i&quot;
+	sleep 60
+    if ping $build_machine -c 2
+    then
+    	echo device is finally up !!
+        sleep 30
+        exit 0
+    fi
+done
+
+echo timeout waiting for the device to become ready!
+exit 1
+</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo device is still connectable!
+
+if $is_dev
+then
+      echo Building a debug image
+      exit 0
+fi
+
+cd
+echo unmounting any sdcard folders
+umount /sdcard/*
+umount /dev/mmcblk0p*
+
+rm -r /sdcard/upgrade
+mkdir -p /sdcard/upgrade/
+
+mkfs.ext4 -O ^metadata_csum,^64bit /dev/mmcblk0p1 -F
+
+sync
+sync
+fsck /dev/mmcblk1p1 -y -f
+
+mount /dev/mmcblk0p1 /sdcard/factory/ || true
+mount /dev/mmcblk0p2 /sdcard/upgrade/ || true
+
+if [ -e /usr/bin/wget.org ]
+then
+    sudo mv /usr/bin/wget.org /usr/bin/wget
+fi
+
+
+df -h
+
+exit 0</command>
+      <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <hudson.tasks.Shell>
+      <command>echo all done for $build_machine, you can call create_factory_settings_sdcard job to create a factory settings image. root password is chaipcr
+
+exit 0</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.28"/>
+  </buildWrappers>
+</project>

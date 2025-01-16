@@ -1,0 +1,205 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Build Chaibio shoftware</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.481.vcb_b_384a_3de89">
+      <optOut>false</optOut>
+    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>build_machine</name>
+          <description>Building machine</description>
+          <defaultValue>192.168.81.32</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <com.syhuang.hudson.plugins.listgitbranchesparameter.ListGitBranchesParameterDefinition plugin="list-git-branches-parameter@0.0.13">
+          <name>build_branch</name>
+          <uuid>c3899c0e-c77e-44d8-8e25-6a9564fc73eb</uuid>
+          <remoteURL>https://github.com/chaibio/chaipcr</remoteURL>
+          <credentialsId></credentialsId>
+          <defaultValue></defaultValue>
+          <type>PT_BRANCH_TAG</type>
+          <tagFilter>*</tagFilter>
+          <branchFilter>.*</branchFilter>
+          <sortMode>NONE</sortMode>
+          <selectedValue>NONE</selectedValue>
+          <quickFilterEnabled>false</quickFilterEnabled>
+          <listSize>5</listSize>
+        </com.syhuang.hudson.plugins.listgitbranchesparameter.ListGitBranchesParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>is_dev</name>
+          <description>Build a development image.</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
+      <siteName>root@$build_machine:22</siteName>
+      <command>#!/bin/bash
+
+echo compiling realtime
+echo &quot;export LC_ALL=C&quot; &gt;&gt; ~/.profile
+
+cd /sdcard/factory/ || exit 1
+free -m
+sync
+
+rm -r /sdcard/factory/realtime-compile || true
+mkdir -p /sdcard/factory/realtime-compile || exit 1</command>
+      <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+    <hudson.tasks.Shell>
+      <command>echo &quot;Shell used: $0&quot;
+
+tmp_folder=/tmp/gitter/$JOB_NAME/$BUILD_NUMBER
+echo working on $tmp_folder
+mkdir -p $tmp_folder
+cd  $tmp_folder
+      
+        echo Branch param $build_branch
+        clean_build_branch=$build_branch
+        clean_build_branch=${clean_build_branch#&quot;remotes/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;branches/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;refs/heads/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;tags/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;trunk&quot;}
+        clean_build_branch=${clean_build_branch#&quot;master&quot;}
+        echo Cleaned branch param $clean_build_branch
+
+        branch_param=
+        branch_name=
+
+        if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
+        then
+                echo No build branch chosen
+        else
+                branch_name=$clean_build_branch
+
+                if [ -z $branch_name ]
+                then
+                        echo Master branch chosen..
+                else
+                    branch_param=&quot;-b $branch_name&quot;
+                    echo Cloning branch and param $branch_name and $branch_param
+                fi
+        fi
+        this_dir=$(pwd)
+        repo_storage=/var/lib/jenkins/userContent/chaibio_repo
+        if [ -e $repo_storage/chaipcr ]
+        then
+                echo found a previous repo copy
+                cd $repo_storage
+                cd chaipcr
+                git pull
+        else
+                echo folder not found, creating the folder and fetching repo: $repo_storage/chaipcr
+                mkdir -p $repo_storage
+                cd $repo_storage
+               git clone $branch_param https://github.com/chaibio/chaipcr.git
+        fi
+        cd $this_dir
+        echo returning to $this_dir
+        if [ -e chaipcr ]
+        then
+                sudo rm -r chaipcr
+        fi
+        if [ -e $repo_storage/chaipcr ]
+        then
+                cp -r $repo_storage/chaipcr .
+        fi
+
+        if [ -e chaipcr ]
+        then
+                echo using preloaded copy of repo
+        else
+                git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+        fi
+        cd chaipcr || exit 1
+
+        if [ -z $branch_name ]
+        then
+                echo No build branch chosen
+        else
+                git checkout $branch_name
+        fi
+        cd ..
+        echo copying repo to $build_machine
+        retry=0
+        until rsync --delete --rsh=&quot;sshpass ssh -o ServerAliveInterval=600 -oStrictHostKeyChecking=no -l root&quot; -a ./chaipcr &quot;$build_machine:/sdcard/factory/realtime-compile/&quot;
+        do
+          if [ $retry -gt 10 ]
+          then
+          		echo error copying files to device
+                exit 1
+          fi
+          echo &quot;Retrying in 5 seconds...&quot;
+  		  sleep 5
+          retry=$((retry+1))
+        done
+        
+        sudo rm -r $tmp_folder
+        exit 0
+        
+        </command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
+      <siteName>root@$build_machine:22</siteName>
+      <command>#!/bin/bash
+
+cd /sdcard/factory/realtime-compile/chaipcr/realtime || exit 1
+
+cp util/instance.h control/
+sed -i &quot;s/dataSapce/dataSpace/&quot; app/experimentcontroller.cpp
+rm libraries/lib/libPoco*
+rm libraries/lib/libboost*
+rm libraries/lib/libsoci*
+
+#qmake
+/opt/QtEmbedded/bin/qmake || exit 1
+
+sed -i &quot;s/arm-unknown-linux-gnueabi-//&quot; Makefile
+sed -i &apos;/^DEFINES[[:space:]]\+=/ s/$/ -DKERNEL_49/&apos; Makefile
+
+make || exit 1
+make install || exit 1
+#cp realtime ~/tmp
+cp libraries/lib/* /usr/lib/
+cd
+
+if $is_dev
+then
+      echo Building a debug image
+else
+      rm -r /sdcard/factory/realtime-compile
+fi
+
+echo  Deploy realtime to ~/tmp 
+cp ~/chaipcr/deploy/device/realtime.service /lib/systemd/system/ || exit 1
+systemctl enable realtime.service
+
+sync
+</command>
+      <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.28"/>
+  </buildWrappers>
+</project>

@@ -1,0 +1,141 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Build Chaibio shoftware 1</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.481.vcb_b_384a_3de89">
+      <optOut>false</optOut>
+    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>build_machine</name>
+          <description>Building machine</description>
+          <defaultValue>192.168.81.32</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+echo checking Jenkins server
+echo &quot;Bash version ${BASH_VERSION}...&quot;
+echo Image build version $image_version
+echo Release build number $release_build_number
+
+uname -a
+ls -ahl
+lsblk
+df -h
+echo user: $(whoami)
+
+echo The following part cannot run concurrently. Try to run deploy_CHAIBIO jobs atleast 20m minutes apart.
+
+echo Checking for nessasery packages:
+sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --allow-downgrades -o Dpkg::Options::=&quot;--force-confdef&quot; -o Dpkg::Options::=&quot;--force-confold&quot; -q update
+sudo dpkg --configure -a --force-confdef --force-confold
+
+sudo apt-get -y -q install sshpass parted
+#sudo apt-get -y -q install ruby
+sudo apt-get -y -q install inetutils-traceroute
+sudo apt-get -y -q install mdadm
+#sudo apt-get -y -q install ruby-dev 
+sudo apt-get -y -q install libxslt-dev 
+sudo apt-get -y -q install libxml2-dev
+sudo apt-get -q -y install jq
+
+#node -v
+#sudo npm install -g n
+#sudo n 8.15.0
+#sudo n 8.11.3
+#node -v
+
+if grep $build_machine /var/lib/jenkins/.ssh/config
+then
+	echo /var/lib/jenkins/.ssh/config was patched already
+else
+	echo patching /var/lib/jenkins/.ssh/config
+fi
+
+#if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
+#then
+#	echo sshd_config was patched already
+#else
+#	echo patching sshd_config
+#	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
+#KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+#EOF
+#	sudo service sshd restart
+#fi
+
+ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
+ssh-keygen -f &quot;/home/jenkins/.ssh/known_hosts&quot; -R $build_machine
+
+echo deleting root password in case of chaipcr
+sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;passwd -d -u root&quot;
+
+ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
+ssh-keygen -f &quot;/home/jenkins/.ssh/known_hosts&quot; -R $build_machine
+
+ssh -t -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
+
+if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
+then
+	echo sshd_config on $build_machine was patched already
+else
+	echo patching sshd_config
+
+cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
+KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
+
+EOF
+	ssh-keygen -A || true
+
+	sudo service sshd restart
+    sudo service ssh restart
+    /etc/init.d/ssh restart
+	echo $build_machine patched
+    ifconfig
+fi
+
+exit 0
+ENDSSH
+
+echo returned to host. connection check:
+counter=0
+until ssh -t -t root@$build_machine &apos;exit 0&apos;
+do
+	counter=$(( $counter + 1 ))
+    if [ $counter -gt 10 ]
+    then
+    	echo Beaglebone is not available.
+    	exit 1
+    fi
+	echo waiting for beaglebone to become connectable.
+	sleep 10
+    
+done
+
+echo done connection check.
+</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.28"/>
+  </buildWrappers>
+</project>

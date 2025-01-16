@@ -1,0 +1,178 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Build Chaibio shoftware</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.481.vcb_b_384a_3de89">
+      <optOut>false</optOut>
+    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>build_machine</name>
+          <description>Building machine</description>
+          <defaultValue>10.0.100.240</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>is_dev</name>
+          <description>Build a development image.</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
+      <siteName>root@$build_machine:22</siteName>
+      <command>echo precompile julia packages if needed
+      if [ -e /etc/bypassjulia.flag ]
+      then
+          echo  Bypass julia build
+          exit 0
+      fi
+
+      if [ -e /root/chaipcr/bioinformatics/juliaserver.jl ]
+      then
+            julia -v
+            echo about to start using QpcrAnalysis
+      else
+            echo building with no julia
+            exit 0
+      fi
+
+     if [ -e /root/chaipcr/bioinformatics/qpcranalysis.so ]
+     then
+          echo julia binaries was generated successfully on a previous precompile.. expecting resuming build.
+          exit 0
+     fi
+
+monitor_cpu_memory () {
+        while true
+        do
+                date
+                echo &quot;CPU Usage&quot;
+                ps aux | sort -nrk 3,3 | head -n 5
+                echo &quot;Memory Usage:&quot;
+                ps aux | sort -nrk 4,4 | head -n 5
+                sleep 60
+        done
+}
+
+monitor_cpu_memory&gt;/var/log/monitor_cpu.log &amp;
+
+      if [ -e /root/.julia ]
+      then
+           echo freeing up .julia
+           umount /root/.julia || true
+           rm -r /root/.julia || true
+      fi
+
+      echo mounting dot julia
+      mkdir -p /root/.julia || exit 1
+      chmod 777 /root/.julia || exit 1
+
+      echo mounting julia dir 
+      mount /dev/mmcblk0p2 /root/.julia || exit 1
+
+      cd
+      if $is_dev
+      then
+             echo Building a debug image
+      else
+            echo Extracting julia files
+            tar xfz /data/dot_julia_complete.tgz || exit 1
+            rm dot_julia.tgz
+      fi
+
+      df -h
+      free -m
+      echo removing unneeded packages
+      export DEBIAN_FRONTEND=noninteractive
+apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data || true
+apt-get -y -q autoremove --purge xserver* apache* gnome* libopencv* desktop* hicolor* xscreensaver* xrdp* xorg* x11-common xdg-utils xkb-data || true
+echo Installing required packages
+	export PATH=$PATH:/sbin:/usr/sbin
+	export TERM=linux
+	echo &apos;debconf debconf/frontend select Noninteractive&apos; | debconf-set-selections
+	DEBIAN_FRONTEND=noninteractive apt-get -q -y  install patchelf
+	DEBIAN_FRONTEND=noninteractive apt-get -q -y  install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev libedit-dev parted git ntp ntpdate build-essential curl python pkg-config libssl-dev libarpack2 libblas3 liblapack3
+         apt install -q -y libcholmod3 libblas-dev  libblas-common || true
+	DEBIAN_FRONTEND=noninteractive apt-get -q -y install libfftw3-dev libgmp3-dev libmpfr-dev libblas-dev liblapack-dev gfortran libgfortran3 m4 libedit-dev parted git ntp build-essential hdf5-tools curl python pkg-config libssl-dev libarpack2 libblas3 libgfortran3 liblapack3  || exit 1
+
+      pkill -9 julia
+      pkill -9 julia
+      pkill -9 julia
+      pkill -9 julia
+      pkill -9 julia
+      ps -aux
+
+      if $is_dev
+      then
+             echo Building a debug image
+      fi
+      mkdir /var/log/ -p || exit 1
+      julia_pkgdir=&quot;/root&quot;
+      export JULIA_PKGDIR=/root/.julia
+
+      cd /root/chaipcr/bioinformatics/build/ || exit 1
+      chmod +x precompilescript.sh || exit 1
+
+      time ./precompilescript.sh $julia_pkgdir || true
+
+     if [ -e /root/chaipcr/bioinformatics/qpcranalysis.so ]
+     then
+          echo julia binaries generated successfully.
+     else
+          echo Error generating julia binaries.
+          exit 1
+     fi
+
+     if $is_dev
+     then
+          echo No clean for dev image
+         df -h
+     else
+            echo Cleaning julia folder
+            find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;
+            find /root/.julia/v0.6/ -name .git | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;/logs/
+            find /root/.julia/.cache/ -name objects | grep -v METADATA | xargs -I &apos;{}&apos; rm -r &apos;{}&apos;  
+  
+            df -h
+            cd
+
+            echo moving julia to eMMC
+            tar czf /sdcard/factory/dot_julia_precompiled.tgz .julia || exit 1
+            killall julia || true
+            pkill -9 julia
+            pkill -9 julia
+            umount .julia || exit 1
+            echo cleaning up old julia folder
+            rm -r .julia
+           # better move this upper
+            rm /data/dot_julia_complete.tgz 
+            tar xzf /sdcard/factory/dot_julia_precompiled.tgz || exit 1
+            echo returned Julia folder
+     fi
+
+du -h --max-depth=1 .
+exit 0
+</command>
+      <execEachLine>false</execEachLine>
+      <hideCommand>false</hideCommand>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.28"/>
+  </buildWrappers>
+</project>

@@ -10,58 +10,39 @@
 </description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty plugin="build-failure-analyzer@1.27.0">
-      <doNotScan>false</doNotScan>
-    </com.sonyericsson.jenkins.plugins.bfa.model.ScannerJobProperty>
-    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.18">
+    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.481.vcb_b_384a_3de89">
       <optOut>false</optOut>
     </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
-          <description></description>
-          <defaultValue>10.0.100.240</defaultValue>
+          <defaultValue>192.168.81.81</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>download_prefix</name>
           <description>Download server url. Example: http://10.0.1.20/download</description>
-          <defaultValue>http://10.0.1.20/download</defaultValue>
+          <defaultValue>http://192.168.81.39/download</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>input_image_prefix</name>
           <description>eMMC name prefix.
 </description>
-          <defaultValue>Jessie49Release</defaultValue>
+          <defaultValue>test_</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.3.0">
-    <configVersion>2</configVersion>
-    <userRemoteConfigs>
-      <hudson.plugins.git.UserRemoteConfig>
-        <url>https://github.com/chaibio/chaipcr.git</url>
-      </hudson.plugins.git.UserRemoteConfig>
-    </userRemoteConfigs>
-    <branches>
-      <hudson.plugins.git.BranchSpec>
-        <name>*/master</name>
-      </hudson.plugins.git.BranchSpec>
-    </branches>
-    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
-    <submoduleCfg class="list"/>
-    <extensions/>
-  </scm>
+  <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers/>
-  <concurrentBuild>false</concurrentBuild>
+  <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
@@ -80,6 +61,8 @@ sudo apt-get -y -q install dirmngr --install-recommends
 
 sudo chmod 777      /var/lib/jenkins/.ssh/known_hosts
 ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
+ssh-keygen -f &quot;/home/jenkins/.ssh/known_hosts&quot; -R $build_machine
+
 #ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
 
 sshpass -p temppwd ssh -t -oStrictHostKeyChecking=no debian@$build_machine &lt;&lt;&apos;ENDSSH&apos;
@@ -97,16 +80,6 @@ sudo passwd -d -u root
 sudo su
 
 echo patching sshd_config
-    
-#sudo cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-#KexAlgorithms diffie-hellman-group1-sha1
-#KexAlgorithms ecdh-sha2-nistp256
-#KexAlgorithms ecdh-sha2-nistp384
-#KexAlgorithms ecdh-sha2-nistp521
-#KexAlgorithms diffie-hellman-group-exchange-sha256
-#KexAlgorithms diffie-hellman-group14-sha1
-#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
-#EOF
 sudo cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
 KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 EOF
@@ -114,10 +87,7 @@ EOF
 ssh-keygen -A || true
 sudo /etc/init.d/ssh restart
 service ssh restart
-
 echo ssh daemon is restarted
-
-
 ENDSSH
 
 echo root access patching returned
@@ -131,33 +101,11 @@ else
 	cat &lt;&lt;EOF &gt;&gt; /var/lib/jenkins/.ssh/config
 Host $build_machine
 		KexAlgorithms +diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-#		KexAlgorithms +diffie-hellman-group1-sha1
-#        KexAlgorithms +curve25519-sha256@libssh.org
-#        KexAlgorithms +ecdh-sha2-nistp256
-#        KexAlgorithms +ecdh-sha2-nistp384
-#        KexAlgorithms +ecdh-sha2-nistp521
-#        KexAlgorithms +diffie-hellman-group-exchange-sha256
-#        KexAlgorithms +diffie-hellman-group14-sha1
 EOF
 fi
 
-#if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
-#then
-#	echo sshd_config was patched already
-#else
-#	echo patching sshd_config
-#	cat &lt;&lt;EOF &gt;&gt; /etc/ssh/sshd_config
-#KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
-#Ciphers 3des-cbc,blowfish-cbc,aes128-cbc,aes128-ctr,aes256-ctr
-#EOF
-#	sudo service sshd restart
-#fi
-
-
 echo deleting root password in case of chaipcr
 sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;passwd -d -u root&quot;
-#echo done deleting root password
-
 
 if ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
 
@@ -197,8 +145,6 @@ else
 KexAlgorithms diffie-hellman-group1-sha1,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
 EOF
 	ssh-keygen -A || true
-
-	
 	sudo service sshd restart
     sudo service ssh restart
     /etc/init.d/ssh restart
@@ -239,8 +185,81 @@ done
 
 echo done connection check.
 sleep 20</command>
+      <configuredLocalRules/>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
+    <hudson.tasks.Shell>
+      <command>build_branch=master
+
+        echo Branch param $build_branch
+        clean_build_branch=$build_branch
+        clean_build_branch=${clean_build_branch#&quot;remotes/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;branches/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;refs/heads/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;tags/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;trunk&quot;}
+        clean_build_branch=${clean_build_branch#&quot;master&quot;}
+        echo Cleaned branch param $clean_build_branch
+
+        branch_param=
+        branch_name=
+
+        if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
+        then
+                echo No build branch chosen
+        else
+                branch_name=$clean_build_branch
+
+                if [ -z $branch_name ]
+                then
+                        echo Master branch chosen..
+                else
+                    branch_param=&quot;-b $branch_name&quot;
+                    echo Cloning branch and param $branch_name and $branch_param
+                fi
+        fi
+        this_dir=$(pwd)
+        repo_storage=/var/lib/jenkins/userContent/chaibio_repo
+        if [ -e $repo_storage/chaipcr ]
+        then
+                echo found a previous repo copy
+                cd $repo_storage
+                cd chaipcr
+                git pull
+        else
+                echo folder not found, creating the folder and fetching repo: $repo_storage/chaipcr
+                mkdir -p $repo_storage
+                cd $repo_storage
+               git clone $branch_param https://github.com/chaibio/chaipcr.git
+        fi
+        cd $this_dir
+        echo returning to $this_dir
+        if [ -e chaipcr ]
+        then
+                sudo rm -r chaipcr
+        fi
+        if [ -e $repo_storage/chaipcr ]
+        then
+                cp -r $repo_storage/chaipcr .
+        fi
+
+        if [ -e chaipcr ]
+        then
+                echo using preloaded copy of repo
+        else
+                git clone $branch_param https://github.com/chaibio/chaipcr.git || exit 1
+        fi
+        cd chaipcr || exit 1
+
+        if [ -z $branch_name ]
+        then
+                echo No build branch chosen
+        else
+                git checkout $branch_name
+        fi
+</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
       <siteName>root@$build_machine:22</siteName>
       <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
 echo &quot;Slave Beaglebone at ${build_machine}&quot;
@@ -279,10 +298,11 @@ echo installing missing packages.
 apt-get update
 echo installing parted.
 apt-get install parted -y -q
+apt-get install hdparm -y -q
 
 blockdev --flushbufs /dev/mmcblk0
 partprobe /dev/mmcblk0
-sfdisk -R /dev/mmcblk0
+# sfdisk -R /dev/mmcblk0
 udevadm trigger --subsystem-match=block; udevadm settle
 blockdev --rereadpt /dev/mmcblk0
 hdparm -z /dev/mmcblk0
@@ -296,7 +316,7 @@ else
 	echo error formatting SDCard. retrying..
         blockdev --flushbufs /dev/mmcblk0
         partprobe /dev/mmcblk0
-        sfdisk -R /dev/mmcblk0
+#        sfdisk -R /dev/mmcblk0
         udevadm trigger --subsystem-match=block; udevadm settle
         blockdev --rereadpt /dev/mmcblk0
         hdparm -z /dev/mmcblk0
@@ -312,6 +332,7 @@ else
  LC_ALL=C sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
 ,,0xe,*
 __EOF__
+        echo formatting /dev/mmcblk0p1
         mkfs.ext4 -O ^metadata_csum,^64bit /dev/mmcblk0p1
         blockdev --flushbufs /dev/mmcblk0
         partprobe /dev/mmcblk0
@@ -332,6 +353,8 @@ __EOF__
 fi
 
 blockdev --flushbufs /dev/mmcblk0
+sudo partprobe /dev/mmcblk0
+sudo blockdev --rereadpt /dev/mmcblk0
 partprobe /dev/mmcblk0
 sfdisk -R /dev/mmcblk0
 udevadm trigger --subsystem-match=block; udevadm settle
@@ -340,15 +363,16 @@ hdparm -z /dev/mmcblk0
 
 echo Formatting..
 
-if command mkfs.fat
+if command -v mkfs.fat
 then
       mkfs.fat /dev/mmcblk0p1 -n CHAIBIO
 else
       mkfs.vfat /dev/mmcblk0p1 -n CHAIBIO
 fi
 echo SDCard formatted!
-
+sync
 mkdir -p /tmp/grep_sdcard
+sync
 if mount /dev/mmcblk0p1 /tmp/grep_sdcard
 then
      echo SDCard mounted successfully.
@@ -359,6 +383,13 @@ fi
 
 lsblk
 df -h
+ulimit -t 1800
+export TMOUT=0
+
+echo &quot;Restoring image: $input_image_prefix by restore job build number $BUILD_NUMBER , to this device starting at: &quot; &gt;&gt; ~/restore_history.log
+date &gt;&gt; ~/restore_history.log
+
+
 exit 0</command>
       <execEachLine>false</execEachLine>
       <hideCommand>false</hideCommand>
@@ -366,34 +397,80 @@ exit 0</command>
     <hudson.tasks.Shell>
       <command>ls
 echo copying grep sdcard contents
-sshpass -p chaipcr scp -r devops/grabimage_sdcard/* root@$build_machine:/tmp/grep_sdcard/
-sshpass -p chaipcr scp -r devops/grabimage_sdcard/uEnv.sdcard.txt root@$build_machine:/tmp/grep_sdcard/uEnv.txt
+scp -r chaipcr/devops/grabimage_sdcard/* root@$build_machine:/tmp/grep_sdcard/
+scp -r chaipcr/devops/grabimage_sdcard/uEnv.sdcard.txt root@$build_machine:/tmp/grep_sdcard/uEnv.txt
+sudo rm -r chaipcr
 
 emmc_image_latest_compressed=${input_image_prefix}_emmc.img.tgz
 emmc_image_latest_url=$download_prefix/${emmc_image_latest_compressed}
-emmc_image_latest_tmp_compressed=/tmp/${BUILD_NUMBER}/${emmc_image_latest_compressed}
+emmc_image_latest_tmp_compressed=/tmp/restore/${BUILD_NUMBER}/${emmc_image_latest_compressed}
 
-emmc_image_latest_tmp_uncompressed_part1=/tmp/${BUILD_NUMBER}/eMMC_part1.img
-emmc_image_latest_tmp_uncompressed_part2=/tmp/${BUILD_NUMBER}/eMMC_part2.img
+emmc_image_latest_tmp_uncompressed_part1=/tmp/restore/${BUILD_NUMBER}/eMMC_part1.img
+emmc_image_latest_tmp_uncompressed_part2=/tmp/restore/${BUILD_NUMBER}/eMMC_part2.img
 
-mkdir -p /tmp/${BUILD_NUMBER}
+mkdir -p /tmp/restore/${BUILD_NUMBER}
 echo downloading and restoring $emmc_image_latest_compressed
 
 wget $emmc_image_latest_url -O $emmc_image_latest_tmp_compressed
-tar xfvz $emmc_image_latest_tmp_compressed --strip=3 -C /tmp/${BUILD_NUMBER}
+
+image_location=$(tar -tf $emmc_image_latest_tmp_compressed | grep eMMC_part2.img)
+echo full image path $image_location
+slashes=$(echo $image_location | tr -cd &apos;/&apos; | wc -c)
+echo slashes are $slashes
+
+tar xfvz $emmc_image_latest_tmp_compressed --strip=$slashes -C /tmp/restore/${BUILD_NUMBER}
 
 echo latest image downloaded
-ls -ahl /tmp/${BUILD_NUMBER}/eMMC_part*
+ls -ahl /tmp/restore/${BUILD_NUMBER}/eMMC_part*
+sync
+ulimit -t 1800
+export TMOUT=0
 
-sshpass -p chaipcr scp -r /tmp/${BUILD_NUMBER}/eMMC_part*.img root@$build_machine:/tmp/grep_sdcard/
+#rsync -avP 
+#ping -c 500 $build_machine &amp;
+
+#scp -v -o ServerAliveInterval=60 -o ServerAliveCountMax=30
+
+export MAX_RETRIES=5
+export RETRY_DELAY=5
+
+echo &quot;first image send&quot;
+
+for i in 1 2 3 4 5
+do
+    echo &quot;Attempt $i of $MAX_RETRIES&quot;
+    rsync  --no-owner --timeout=30 --partial --append-verify -avzP /tmp/restore/${BUILD_NUMBER}/eMMC_part1.img root@$build_machine:/tmp/grep_sdcard/ &amp;&amp; break
+    echo &quot;Transfer failed. Retrying in $RETRY_DELAY seconds...&quot;
+    sleep $RETRY_DELAY
+done
+
+echo &quot;second image send&quot;
+
+for i in 1 2 3 4 5
+do
+    echo &quot;Attempt $i of $MAX_RETRIES&quot;
+ 	rsync  --no-owner --timeout=30 --partial --append-verify -avzP /tmp/restore/${BUILD_NUMBER}/eMMC_part2.img root@$build_machine:/tmp/grep_sdcard/ &amp;&amp; break
+    echo &quot;Transfer failed. Retrying in $RETRY_DELAY seconds...&quot;
+    sleep $RETRY_DELAY
+done
+
+
+
+
+sleep 10
+sync
+#scp -v -o ServerAliveInterval=60 -o ServerAliveCountMax=30 
+#rsync -avP /tmp/restore/${BUILD_NUMBER}/eMMC_part2.img root@$build_machine:/tmp/grep_sdcard/
+
 rm $emmc_image_latest_tmp_uncompressed_part1  || true
 rm $emmc_image_latest_tmp_uncompressed_part2  || true
 rm $emmc_image_latest_tmp_compressed || true
 
 
 </command>
+      <configuredLocalRules/>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
       <siteName>root@$build_machine:22</siteName>
       <command>echo patching grep sdcard to boot only once
 #cp /tmp/grep_sdcard/autorun.sh /tmp/grep_sdcard/autorun.sh.org
@@ -423,7 +500,7 @@ exit 0</command>
     <hudson.tasks.Shell>
       <command>#!/bin/bash
 
-rm -r /tmp/${BUILD_NUMBER} || true
+#rm -r /tmp/restore/${BUILD_NUMBER} || true
 
 echo waiting for a restart
 sleep 1200
@@ -434,17 +511,28 @@ do
     if ping $build_machine -c 3
     then
     	echo device is finally up !!
-        sleep 300
+        echo cleaning up
+        rm -r /tmp/restore/${BUILD_NUMBER}
+        sync
+      	sleep 360
         exit 0
     fi
 done
 
 echo timeout waiting for the device to become ready!
 exit 1</command>
+      <configuredLocalRules/>
     </hudson.tasks.Shell>
-    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo All done.
+      <command>if [ -e ~/restore_history.log ]
+then
+    echo &quot;Restore job failed. Check the restore jobs mentioned in the history. The restore history of this device as below:&quot;
+    cat ~/restore_history.log
+    exit 1
+fi
+
+echo All done.
 # debug markers 
 # mark=`date &apos;+%m_%d__%H_%M_%S&apos;`;mkdir -p /root/jr_$download_prefix_rootfs_${mark} /perm/jr_$download_prefix_perm_${mark} /data/jr_$download_prefix_data_${mark};sync
 
@@ -456,6 +544,6 @@ exit 0
   </builders>
   <publishers/>
   <buildWrappers>
-    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.11.3"/>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.28"/>
   </buildWrappers>
 </project>
