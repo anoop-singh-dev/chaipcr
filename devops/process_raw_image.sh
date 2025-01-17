@@ -726,6 +726,7 @@ else
 	echo "Data image not found: $image_filename_data"
 fi
 
+# factory settings image
 echo "Finalizing: $image_filename_upgrade2"
 if mv $image_filename_upgrade_temp $image_filename_upgrade2
 then
@@ -752,7 +753,7 @@ fi
 echo "packaging factory scripts in upgrade image."
 cp -r ${output_dir}/p1/* $temp/$factory_scripts
 
-if tar cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $image_filename_format_data $checksums_filename $upgrade_scripts $config_filenames $factory_scripts --exclude=factory_settings.img.tar
+if tar --exclude=factory_settings.img.tar -cvf $image_filename_upgrade_temp $image_filename_pt $image_filename_boot $image_filename_rootfs $image_filename_perm $image_filename_format_data $checksums_filename $upgrade_scripts $config_filenames $factory_scripts
 then
 	echo $image_filename_upgrade_temp generatted.
 else
