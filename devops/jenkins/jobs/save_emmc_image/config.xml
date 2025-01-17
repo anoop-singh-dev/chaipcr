@@ -186,7 +186,10 @@ echo done connection check.
 
 ls
 echo now at $(pwd)
-rm build_report.xml
+if [ -e build_report ]
+then
+   rm build_report.xml
+fi
         
 tmp_folder=/tmp/gitter/$JOB_NAME/$BUILD_NUMBER
 echo working on $tmp_folder
@@ -509,7 +512,7 @@ mount /dev/mmcblk0p1 /tmp/grep_sdcard
 stamp=$(date &apos;+%Y%M%d%H%m%S&apos;)
 grep_sdcard_dir=&quot;/tmp/save/${BUILD_NUMBER}/emmc_inbox_${stamp}&quot;
 tmp_sdcard_dir=&quot;/tmp/save/${BUILD_NUMBER}/sdcard_${stamp}&quot;
-
+artifacts_dir=$(pwd)
 echo grep sdcard folder [input]: $grep_sdcard_dir
 mkdir -p &quot;${grep_sdcard_dir}&quot;
 
@@ -546,7 +549,7 @@ then
 	echo latest eMMC for this build machine is downloadable from $full_emmc_url
 	sudo rm -r $grep_sdcard_dir || true
  
-build_report_filename=build_report.xml
+build_report_filename=$artifacts_dir/build_report.xml
 #_$BUILD_NUMBER.xml
 echo Report filename is $build_report_filename
 cat &lt;&lt; EOF &gt; $build_report_filename
@@ -637,7 +640,7 @@ fi
 sudo rm -r $grep_sdcard_dir || true
 cd ../../..
 
-build_report_filename=build_report.xml
+build_report_filename=$artifacts_dir/build_report.xml
 #_$BUILD_NUMBER.xml
 echo Report filename is $build_report_filename
 cat &lt;&lt; EOF &gt; $build_report_filename
@@ -673,7 +676,7 @@ partition_sdcard() {
 ,10485760,0x83,*
 ,,0x83,*
 __EOF__
-
+	 echo reread partition
      /sbin/partprobe /dev/mmcblk0  || true
      /sbin/mkfs.ext4 -O ^metadata_csum,^64bit /dev/mmcblk0p1 -F  || true
      /sbin/mkfs.ext4 -O ^metadata_csum,^64bit /dev/mmcblk0p2 -F  || true
