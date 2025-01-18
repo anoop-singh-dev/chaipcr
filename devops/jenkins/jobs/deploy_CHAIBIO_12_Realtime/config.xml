@@ -12,12 +12,12 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>Building machine</description>
-          <defaultValue>192.168.81.32</defaultValue>
+          <defaultValue>192.168.68.191</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <com.syhuang.hudson.plugins.listgitbranchesparameter.ListGitBranchesParameterDefinition plugin="list-git-branches-parameter@0.0.13">
           <name>build_branch</name>
-          <uuid>c3899c0e-c77e-44d8-8e25-6a9564fc73eb</uuid>
+          <uuid>bb2e924d-038d-4fc4-9f4d-cfb0940e1c48</uuid>
           <remoteURL>https://github.com/chaibio/chaipcr</remoteURL>
           <credentialsId></credentialsId>
           <defaultValue></defaultValue>
@@ -44,14 +44,14 @@
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers/>
-  <concurrentBuild>true</concurrentBuild>
+  <concurrentBuild>false</concurrentBuild>
   <builders>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
       <siteName>root@$build_machine:22</siteName>
       <command>#!/bin/bash
 
 echo compiling realtime
-echo &quot;export LC_ALL=C&quot; &gt;&gt; ~/.profile
+echo "export LC_ALL=C" &gt;&gt; ~/.profile
 
 cd /sdcard/factory/ || exit 1
 free -m
@@ -63,7 +63,7 @@ mkdir -p /sdcard/factory/realtime-compile || exit 1</command>
       <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
-      <command>echo &quot;Shell used: $0&quot;
+      <command>echo "Shell used: $0"
 
 tmp_folder=/tmp/gitter/$JOB_NAME/$BUILD_NUMBER
 echo working on $tmp_folder
@@ -72,18 +72,18 @@ cd  $tmp_folder
       
         echo Branch param $build_branch
         clean_build_branch=$build_branch
-        clean_build_branch=${clean_build_branch#&quot;remotes/&quot;}
-        clean_build_branch=${clean_build_branch#&quot;branches/&quot;}
-        clean_build_branch=${clean_build_branch#&quot;refs/heads/&quot;}
-        clean_build_branch=${clean_build_branch#&quot;tags/&quot;}
-        clean_build_branch=${clean_build_branch#&quot;trunk&quot;}
-        clean_build_branch=${clean_build_branch#&quot;master&quot;}
+        clean_build_branch=${clean_build_branch#"remotes/"}
+        clean_build_branch=${clean_build_branch#"branches/"}
+        clean_build_branch=${clean_build_branch#"refs/heads/"}
+        clean_build_branch=${clean_build_branch#"tags/"}
+        clean_build_branch=${clean_build_branch#"trunk"}
+        clean_build_branch=${clean_build_branch#"master"}
         echo Cleaned branch param $clean_build_branch
 
         branch_param=
         branch_name=
 
-        if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
+        if [ -z $build_branch ] || ! [[ "$build_branch" == *\/* ]]  || [ "$build_branch" = "trunk" ]
         then
                 echo No build branch chosen
         else
@@ -93,7 +93,7 @@ cd  $tmp_folder
                 then
                         echo Master branch chosen..
                 else
-                    branch_param=&quot;-b $branch_name&quot;
+                    branch_param="-b $branch_name"
                     echo Cloning branch and param $branch_name and $branch_param
                 fi
         fi
@@ -104,7 +104,11 @@ cd  $tmp_folder
                 echo found a previous repo copy
                 cd $repo_storage
                 cd chaipcr
-                git pull
+                until git pull
+                do
+                	echo error pulling github.. retrying in 1 min!
+                    sleep 60
+                done
         else
                 echo folder not found, creating the folder and fetching repo: $repo_storage/chaipcr
                 mkdir -p $repo_storage
@@ -139,14 +143,14 @@ cd  $tmp_folder
         cd ..
         echo copying repo to $build_machine
         retry=0
-        until rsync --delete --rsh=&quot;sshpass ssh -o ServerAliveInterval=600 -oStrictHostKeyChecking=no -l root&quot; -a ./chaipcr &quot;$build_machine:/sdcard/factory/realtime-compile/&quot;
+        until rsync --delete --rsh="sshpass ssh -o ServerAliveInterval=600 -oStrictHostKeyChecking=no -l root" -a ./chaipcr "$build_machine:/sdcard/factory/realtime-compile/"
         do
           if [ $retry -gt 10 ]
           then
           		echo error copying files to device
                 exit 1
           fi
-          echo &quot;Retrying in 5 seconds...&quot;
+          echo "Retrying in 5 seconds..."
   		  sleep 5
           retry=$((retry+1))
         done
@@ -164,7 +168,7 @@ cd  $tmp_folder
 cd /sdcard/factory/realtime-compile/chaipcr/realtime || exit 1
 
 cp util/instance.h control/
-sed -i &quot;s/dataSapce/dataSpace/&quot; app/experimentcontroller.cpp
+sed -i "s/dataSapce/dataSpace/" app/experimentcontroller.cpp
 rm libraries/lib/libPoco*
 rm libraries/lib/libboost*
 rm libraries/lib/libsoci*
@@ -172,7 +176,7 @@ rm libraries/lib/libsoci*
 #qmake
 /opt/QtEmbedded/bin/qmake || exit 1
 
-sed -i &quot;s/arm-unknown-linux-gnueabi-//&quot; Makefile
+sed -i "s/arm-unknown-linux-gnueabi-//" Makefile
 sed -i &apos;/^DEFINES[[:space:]]\+=/ s/$/ -DKERNEL_49/&apos; Makefile
 
 make || exit 1

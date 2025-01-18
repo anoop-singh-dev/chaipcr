@@ -17,13 +17,13 @@
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
-          <defaultValue>192.168.81.81</defaultValue>
+          <defaultValue>192.168.68.190</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>download_prefix</name>
           <description>Download server url. Example: http://10.0.1.20/download</description>
-          <defaultValue>http://192.168.81.39/download</defaultValue>
+          <defaultValue>http://192.168.68.110/download</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -47,7 +47,7 @@
     <hudson.tasks.Shell>
       <command>#!/bin/bash
 echo checking Jenkins server
-echo &quot;Bash version ${BASH_VERSION}...&quot;
+echo "Bash version ${BASH_VERSION}..."
 uname -a
 ls -ahl
 lsblk
@@ -60,10 +60,10 @@ sudo apt-get -y -q install sshpass parted mdadm --allow-unauthenticated
 sudo apt-get -y -q install dirmngr --install-recommends
 
 sudo chmod 777      /var/lib/jenkins/.ssh/known_hosts
-ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
-ssh-keygen -f &quot;/home/jenkins/.ssh/known_hosts&quot; -R $build_machine
+ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R $build_machine
+ssh-keygen -f "/home/jenkins/.ssh/known_hosts" -R $build_machine
 
-#ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
+#ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R $build_machine
 
 sshpass -p temppwd ssh -t -oStrictHostKeyChecking=no debian@$build_machine &lt;&lt;&apos;ENDSSH&apos;
 echo enable root access with no password
@@ -105,7 +105,7 @@ EOF
 fi
 
 echo deleting root password in case of chaipcr
-sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;passwd -d -u root&quot;
+sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine "passwd -d -u root"
 
 if ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
 
@@ -130,9 +130,9 @@ fi
 exit 0
 ENDSSH
 then
-   echo &quot;-t worked&quot;
+   echo "-t worked"
 else
-echo &quot; trying -tt&quot;
+echo " trying -tt"
 ssh -tt -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
 
 if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
@@ -192,18 +192,18 @@ sleep 20</command>
 
         echo Branch param $build_branch
         clean_build_branch=$build_branch
-        clean_build_branch=${clean_build_branch#&quot;remotes/&quot;}
-        clean_build_branch=${clean_build_branch#&quot;branches/&quot;}
-        clean_build_branch=${clean_build_branch#&quot;refs/heads/&quot;}
-        clean_build_branch=${clean_build_branch#&quot;tags/&quot;}
-        clean_build_branch=${clean_build_branch#&quot;trunk&quot;}
-        clean_build_branch=${clean_build_branch#&quot;master&quot;}
+        clean_build_branch=${clean_build_branch#"remotes/"}
+        clean_build_branch=${clean_build_branch#"branches/"}
+        clean_build_branch=${clean_build_branch#"refs/heads/"}
+        clean_build_branch=${clean_build_branch#"tags/"}
+        clean_build_branch=${clean_build_branch#"trunk"}
+        clean_build_branch=${clean_build_branch#"master"}
         echo Cleaned branch param $clean_build_branch
 
         branch_param=
         branch_name=
 
-        if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
+        if [ -z $build_branch ] || ! [[ "$build_branch" == *\/* ]]  || [ "$build_branch" = "trunk" ]
         then
                 echo No build branch chosen
         else
@@ -213,7 +213,7 @@ sleep 20</command>
                 then
                         echo Master branch chosen..
                 else
-                    branch_param=&quot;-b $branch_name&quot;
+                    branch_param="-b $branch_name"
                     echo Cloning branch and param $branch_name and $branch_param
                 fi
         fi
@@ -224,12 +224,16 @@ sleep 20</command>
                 echo found a previous repo copy
                 cd $repo_storage
                 cd chaipcr
-                git pull
+                until git pull
+                do
+                	echo error git pulling.. retrying in a minute.
+                    sleep 60
+                done
         else
                 echo folder not found, creating the folder and fetching repo: $repo_storage/chaipcr
                 mkdir -p $repo_storage
                 cd $repo_storage
-               git clone $branch_param https://github.com/chaibio/chaipcr.git
+                git clone $branch_param https://github.com/chaibio/chaipcr.git
         fi
         cd $this_dir
         echo returning to $this_dir
@@ -261,10 +265,10 @@ sleep 20</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
-echo &quot;Slave Beaglebone at ${build_machine}&quot;
+      <command>echo "Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}"
+echo "Slave Beaglebone at ${build_machine}"
 echo checking build device 
-echo &quot;Bash version ${BASH_VERSION}...&quot;
+echo "Bash version ${BASH_VERSION}..."
 uname -a
 ls -ahl
 lsblk
@@ -290,15 +294,15 @@ umount /sdcard/*
 lsblk
 if mount | grep mmcblk0
 then
-  echo &quot;Error: can&apos;t unmount sdcard!&quot;
+  echo "Error: can&apos;t unmount sdcard!"
   exit 1
 fi
 
 echo installing missing packages.
 apt-get update
 echo installing parted.
-apt-get install parted -y -q
-apt-get install hdparm -y -q
+sudo apt-get install parted -y -q
+sudo apt-get install hdparm -y -q
 
 blockdev --flushbufs /dev/mmcblk0
 partprobe /dev/mmcblk0
@@ -386,7 +390,7 @@ df -h
 ulimit -t 1800
 export TMOUT=0
 
-echo &quot;Restoring image: $input_image_prefix by restore job build number $BUILD_NUMBER , to this device starting at: &quot; &gt;&gt; ~/restore_history.log
+echo "Restoring image: $input_image_prefix by restore job build number $BUILD_NUMBER , to this device starting at: " &gt;&gt; ~/restore_history.log
 date &gt;&gt; ~/restore_history.log
 
 
@@ -434,23 +438,23 @@ export TMOUT=0
 export MAX_RETRIES=5
 export RETRY_DELAY=5
 
-echo &quot;first image send&quot;
+echo "first image send"
 
 for i in 1 2 3 4 5
 do
-    echo &quot;Attempt $i of $MAX_RETRIES&quot;
+    echo "Attempt $i of $MAX_RETRIES"
     rsync  --no-owner --timeout=30 --partial --append-verify -avzP /tmp/restore/${BUILD_NUMBER}/eMMC_part1.img root@$build_machine:/tmp/grep_sdcard/ &amp;&amp; break
-    echo &quot;Transfer failed. Retrying in $RETRY_DELAY seconds...&quot;
+    echo "Transfer failed. Retrying in $RETRY_DELAY seconds..."
     sleep $RETRY_DELAY
 done
 
-echo &quot;second image send&quot;
+echo "second image send"
 
 for i in 1 2 3 4 5
 do
-    echo &quot;Attempt $i of $MAX_RETRIES&quot;
+    echo "Attempt $i of $MAX_RETRIES"
  	rsync  --no-owner --timeout=30 --partial --append-verify -avzP /tmp/restore/${BUILD_NUMBER}/eMMC_part2.img root@$build_machine:/tmp/grep_sdcard/ &amp;&amp; break
-    echo &quot;Transfer failed. Retrying in $RETRY_DELAY seconds...&quot;
+    echo "Transfer failed. Retrying in $RETRY_DELAY seconds..."
     sleep $RETRY_DELAY
 done
 
@@ -475,12 +479,12 @@ rm $emmc_image_latest_tmp_compressed || true
       <command>echo patching grep sdcard to boot only once
 #cp /tmp/grep_sdcard/autorun.sh /tmp/grep_sdcard/autorun.sh.org
 
-sed &quot;s/reboot/rm \/mnt\/uEnv.txt ; reboot/&quot; -i /tmp/grep_sdcard/autorun.sh
-sed &quot;s/halt/rm \/mnt\/uEnv.txt ; reboot # /&quot; -i /tmp/grep_sdcard/autorun.sh
-sed &quot;s/restore=false/restore=true/&quot; -i /tmp/grep_sdcard/pack_latest_version.sh
+sed "s/reboot/rm \/mnt\/uEnv.txt ; reboot/" -i /tmp/grep_sdcard/autorun.sh
+sed "s/halt/rm \/mnt\/uEnv.txt ; reboot # /" -i /tmp/grep_sdcard/autorun.sh
+sed "s/restore=false/restore=true/" -i /tmp/grep_sdcard/pack_latest_version.sh
 
-sed &quot;s/reboot/rm \/mnt\/uEnv.txt ; reboot/&quot; -i /tmp/grep_sdcard/pack_latest_version.sh
-sed &quot;s/halt/rm \/mnt\/uEnv.txt ; reboot # /&quot; -i /tmp/grep_sdcard/pack_latest_version.sh
+sed "s/reboot/rm \/mnt\/uEnv.txt ; reboot/" -i /tmp/grep_sdcard/pack_latest_version.sh
+sed "s/halt/rm \/mnt\/uEnv.txt ; reboot # /" -i /tmp/grep_sdcard/pack_latest_version.sh
 
 #mv /tmp/grep_sdcard/autorun.sh  /tmp/grep_sdcard/autorun.sh.tmp
 
@@ -506,7 +510,7 @@ echo waiting for a restart
 sleep 1200
 for i in {0..2400..60}
 do
-	echo &quot;Waiting for the build device to become ready! $i&quot;
+	echo "Waiting for the build device to become ready! $i"
 	sleep 60
     if ping $build_machine -c 3
     then
@@ -527,7 +531,7 @@ exit 1</command>
       <siteName>root@$build_machine:22</siteName>
       <command>if [ -e ~/restore_history.log ]
 then
-    echo &quot;Restore job failed. Check the restore jobs mentioned in the history. The restore history of this device as below:&quot;
+    echo "Restore job failed. Check the restore jobs mentioned in the history. The restore history of this device as below:"
     cat ~/restore_history.log
     exit 1
 fi

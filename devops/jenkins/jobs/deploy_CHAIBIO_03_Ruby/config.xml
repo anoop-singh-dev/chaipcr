@@ -44,25 +44,25 @@
     <hudson.tasks.Shell>
       <command>#!/bin/bash
 
-        echo &quot;Shell used: $0&quot;
+        echo "Shell used: $0"
         echo now at $(pwd)
         gem env
         if gem env | grep rubygems.org
         then
-            echo &quot;ruby source already added&quot;
+            echo "ruby source already added"
         else
             # this step is not important as we haverubygems.org/ under remote sources
             gem sources --add https://rubygems.org/
             gem sources --add http://rubygems.org/
         fi
 
-        sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes -o Dpkg::Options::=&quot;--force-confdef&quot; -o Dpkg::Options::=&quot;--force-confold&quot; -q update
+        sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -q update
         sudo dpkg --configure -a --force-confdef --force-confold
         sudo apt-get -y -q install -y libncurses5-dev || true
         sudo apt-get -y -q install ca-certificates software-properties-common 
 
         sudo apt-add-repository -y ppa:rael-gc/rvm
-        sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes -o Dpkg::Options::=&quot;--force-confdef&quot; -o Dpkg::Options::=&quot;--force-confold&quot; -q update
+        sudo DEBIAN_FRONTEND=noninteractive apt-get --yes --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -q update
         sudo dpkg --configure -a --force-confdef --force-confold
 
 #        sudo apt-get -y -q install nodejs-legacy || true
@@ -101,7 +101,7 @@
                 echo installing libssl1.0-dev from jessie repo
                 sudo chmod 777 /etc/apt/sources.list.d/
                 sudo rm /etc/apt/sources.list.d/libssl10.list || true
-                sudo echo &quot;deb http://security.ubuntu.com/ubuntu bionic-security main&quot;&gt; /etc/apt/sources.list.d/libssl10.list
+                sudo echo "deb http://security.ubuntu.com/ubuntu bionic-security main"&gt; /etc/apt/sources.list.d/libssl10.list
                 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 9D6D8F6BC857C906  
                 sudo apt-get update -y -q
                 sudo apt-get install -y --no-install-recommends libssl1.0-dev
@@ -124,18 +124,18 @@
                 
         echo Branch param $build_branch
         clean_build_branch=$build_branch
-        clean_build_branch=${clean_build_branch#&quot;remotes/&quot;}
-        clean_build_branch=${clean_build_branch#&quot;branches/&quot;}
-        clean_build_branch=${clean_build_branch#&quot;refs/heads/&quot;}
-        clean_build_branch=${clean_build_branch#&quot;tags/&quot;}
-        clean_build_branch=${clean_build_branch#&quot;trunk&quot;}
-        clean_build_branch=${clean_build_branch#&quot;master&quot;}
+        clean_build_branch=${clean_build_branch#"remotes/"}
+        clean_build_branch=${clean_build_branch#"branches/"}
+        clean_build_branch=${clean_build_branch#"refs/heads/"}
+        clean_build_branch=${clean_build_branch#"tags/"}
+        clean_build_branch=${clean_build_branch#"trunk"}
+        clean_build_branch=${clean_build_branch#"master"}
         echo Cleaned branch param $clean_build_branch
 
         branch_param=
         branch_name=
 
-        if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
+        if [ -z $build_branch ] || ! [[ "$build_branch" == *\/* ]]  || [ "$build_branch" = "trunk" ]
         then
                 echo No build branch chosen
         else
@@ -145,7 +145,7 @@
                 then
                         echo Master branch chosen..
                 else
-                    branch_param=&quot;-b $branch_name&quot;
+                    branch_param="-b $branch_name"
                     echo Cloning branch and param $branch_name and $branch_param
                 fi
         fi
@@ -219,7 +219,7 @@
         
         #echo gitting
         #git clone https://github.com/chaibio/chaipcr.git
-        #cd &quot;$chaibio_web&quot;
+        #cd "$chaibio_web"
         
         echo install gulp locally
         npm install sass
@@ -242,23 +242,23 @@
         echo Release build number is $release_build_number
 		rm -rf ./web/log
         
-        version_number=$(jq &quot;.software.version&quot; ./device/configuration.json)
+        version_number=$(jq ".software.version" ./device/configuration.json)
 		if ! [ -z $version_number ]
 		then
-        	prefix=&quot;\&quot;&quot;
-        	suffix=&quot;.RELATIVE_BUILDNUMBER\&quot;&quot;
-        	version_number=${version_number%&quot;$RELATIVE_BUILDNUMBER&quot;}
-        	version_number_trimmed=$(echo $version_number | sed -e &quot;s/^$prefix//&quot; -e &quot;s/$suffix$//&quot;)
+        	prefix="\""
+        	suffix=".RELATIVE_BUILDNUMBER\""
+        	version_number=${version_number%"$RELATIVE_BUILDNUMBER"}
+        	version_number_trimmed=$(echo $version_number | sed -e "s/^$prefix//" -e "s/$suffix$//")
         	if ! [ -z $version_number_trimmed ]
         	then
-                echo &quot;Version: $version_number_trimmed&quot;
-                relative_build_number_filename=&quot;$HUDSON_HOME/userContent/lastbuildnumber/$version_number_trimmed&quot;
-                if ! [ -d &quot;$HUDSON_HOME/userContent/lastbuildnumber/&quot; ]
+                echo "Version: $version_number_trimmed"
+                relative_build_number_filename="$HUDSON_HOME/userContent/lastbuildnumber/$version_number_trimmed"
+                if ! [ -d "$HUDSON_HOME/userContent/lastbuildnumber/" ]
                 then
-                        mkdir -p &quot;$HUDSON_HOME/userContent/lastbuildnumber/&quot;
+                        mkdir -p "$HUDSON_HOME/userContent/lastbuildnumber/"
                         echo 1&gt;$relative_build_number_filename
                 fi
-                if ! [ -e &quot;$relative_build_number_filename&quot; ]
+                if ! [ -e "$relative_build_number_filename" ]
                 then
                         echo 1&gt;$relative_build_number_filename
                 fi
@@ -271,21 +271,21 @@
         	fi
 		fi
 
-		sed -i &apos;s/&quot;version&quot;: &quot;1.0.0&quot;,/&quot;version&quot;: &quot;&apos;${image_version}&apos;&quot;,/g&apos; ./device/configuration.json || true
-#		sed -i &apos;s/&quot;version&quot;: &quot;1.1.1&quot;,/&quot;version&quot;: &quot;&apos;${image_version}&apos;&quot;,/g&apos; ./device/configuration.json || true
+		sed -i &apos;s/"version": "1.0.0",/"version": "&apos;${image_version}&apos;",/g&apos; ./device/configuration.json || true
+#		sed -i &apos;s/"version": "1.1.1",/"version": "&apos;${image_version}&apos;",/g&apos; ./device/configuration.json || true
         sed -i &apos;s/BUILD_NUMBER/&apos;${release_build_number}&apos;/g&apos; ./device/configuration.json  || true
-		echo -e &quot;Jenkins release number# $release_build_number\n&quot;&gt;changes.log
-        echo &quot;Changes (last 4 weeks)&quot;&gt;&gt;changes.log
-        git log --pretty=format:&quot;%h - %an, %ar : %s&quot; --since=4.weeks&gt;&gt;changes.log
+		echo -e "Jenkins release number# $release_build_number\n"&gt;changes.log
+        echo "Changes (last 4 weeks)"&gt;&gt;changes.log
+        git log --pretty=format:"%h - %an, %ar : %s" --since=4.weeks&gt;&gt;changes.log
 
 		echo $release_build_number&gt;build_number.ini
 # waiting 20min for the bulding device to become connectable
-echo &quot;Waiting for the build device ($build_machine) to become ready!&quot;
+echo "Waiting for the build device ($build_machine) to become ready!"
 #sleep 1500
 
 for i in {0..1200..60}
 do
-    echo &quot;Waiting for the build device ($build_machine) to become ready! $i&quot;
+    echo "Waiting for the build device ($build_machine) to become ready! $i"
 	sleep 10
 
 	if ping $build_machine -c 2
@@ -293,8 +293,8 @@ do
     	echo device is finally up !!
         sleep 10
         
-		ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
-        ssh-keygen -f &quot;/home/jenkins/.ssh/known_hosts&quot; -R $build_machine
+		ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R $build_machine
+        ssh-keygen -f "/home/jenkins/.ssh/known_hosts" -R $build_machine
 
 		ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
 		echo $build_machine device is connectable.. 
@@ -319,23 +319,23 @@ ENDSSH
 		echo ssh is connectable... ~/copying chaipcr folder..
         sleep 10
 		pwd
-		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./web &quot;$build_machine:/root/chaipcr/&quot; || (echo error copying files to device &amp;&amp; exit 1)
-		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./browser &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
-		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./bioinformatics &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
-		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./device/configuration.json &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
-		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./device/configuration.json &quot;$build_machine:/root/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
-        rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a changes.log &quot;$build_machine:/root/chaipcr/deploy/&quot;  || true # (echo error copying files to device &amp;&amp; exit 1)
+		rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./web "$build_machine:/root/chaipcr/" || (echo error copying files to device &amp;&amp; exit 1)
+		rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./browser "$build_machine:/root/chaipcr/"  || (echo error copying files to device &amp;&amp; exit 1)
+		rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./bioinformatics "$build_machine:/root/chaipcr/"  || (echo error copying files to device &amp;&amp; exit 1)
+		rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./device/configuration.json "$build_machine:/root/chaipcr/deploy/"  || (echo error copying files to device &amp;&amp; exit 1)
+		rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./device/configuration.json "$build_machine:/root/"  || (echo error copying files to device &amp;&amp; exit 1)
+        rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a changes.log "$build_machine:/root/chaipcr/deploy/"  || true # (echo error copying files to device &amp;&amp; exit 1)
         if [ -e ./realtime/wifi ]
         then
-        	rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./realtime/wifi &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
+        	rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./realtime/wifi "$build_machine:/root/chaipcr/deploy/"  || (echo error copying files to device &amp;&amp; exit 1)
 		fi
-		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./devops/factory_settings_sdcard/scripts/replace_uEnv.txt.sh &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
+		rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./devops/factory_settings_sdcard/scripts/replace_uEnv.txt.sh "$build_machine:/root/chaipcr/deploy/"  || (echo error copying files to device &amp;&amp; exit 1)
         if [ -e ./devops/factory_settings_sdcard/scripts/setup_touchcontroller.sh ]
         then
-        	rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./devops/factory_settings_sdcard/scripts/setup_touchcontroller.sh &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
+        	rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./devops/factory_settings_sdcard/scripts/setup_touchcontroller.sh "$build_machine:/root/chaipcr/deploy/"  || (echo error copying files to device &amp;&amp; exit 1)
         fi
-		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./devops/device &quot;$build_machine:/root/chaipcr/deploy/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
-		rsync --delete --rsh=&quot;sshpass ssh -oStrictHostKeyChecking=no -l root&quot; -a ./modules &quot;$build_machine:/root/chaipcr/&quot;  || (echo error copying files to device &amp;&amp; exit 1)
+		rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./devops/device "$build_machine:/root/chaipcr/deploy/"  || (echo error copying files to device &amp;&amp; exit 1)
+		rsync --delete --rsh="sshpass ssh -oStrictHostKeyChecking=no -l root" -a ./modules "$build_machine:/root/chaipcr/"  || (echo error copying files to device &amp;&amp; exit 1)
 		echo copy is done		
         cd ../..
         if [ -e tmp ]
