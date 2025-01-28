@@ -12,7 +12,7 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>Building machine</description>
-          <defaultValue>192.168.81.32</defaultValue>
+          <defaultValue>192.168.68.191</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
@@ -37,6 +37,75 @@
       <command>echo unmounting any sdcard folders
 DEBIAN_FRONTEND=noninteractive apt-get -q -y  install parted hostapd
 
+lsblk
+df -h
+
+
+pkill julia
+pkill julia
+pkill julia
+pkill julia
+pkill julia
+pkill julia
+
+# Extract PIDs related to &apos;sdcard&apos; using lsof
+for trys in {1..5}
+do
+echo Retry $trys
+for pid in $(lsof | grep sdcard | awk &apos;{print $2}&apos; | sort -u)
+do
+    echo &quot;Processing PID: $pid&quot;
+    # Perform any action on the PID, e.g., killing the process
+    sudo kill -9 &quot;$pid&quot; 2&gt;/dev/null &amp;&amp; echo &quot;Killed PID $pid&quot; || echo &quot;Failed to kill PID $pid&quot;
+done
+
+
+# Find all Julia processes and terminate them
+echo &quot;Searching for Julia processes...&quot;
+
+# Loop through each Julia process
+for pid in $(pgrep julia)
+do
+    echo &quot;Killing Julia process with PID: $pid&quot;
+    sudo kill -9 &quot;$pid&quot; 2&gt;/dev/null
+
+    # Check if the process was successfully killed
+    if ps -p &quot;$pid&quot; &gt; /dev/null
+    then
+        echo &quot;Failed to kill process $pid. Retrying...&quot;
+    else
+        echo &quot;Process $pid successfully terminated.&quot;
+    fi
+    sleep 20
+done
+done
+echo &quot;All Julia processes terminated.&quot;
+
+echo closing swap files
+sudo swapoff -a
+
+# debug markers 
+# mark=`date &apos;+%m_%d__%H_%M_%S&apos;`;mkdir -p /root/SWAP_B4_rootfs_${mark} /perm/REST_B4_perm_${mark} /data/SWAP_B4_data_${mark};sync
+
+echo processing incomplete installations
+dpkg --configure -a --force-confdef
+
+mkdir -p /run/chaipcr/
+touch /run/chaipcr/exit_all.flag
+pkill julia;pkill julia;pkill julia;pkill julia;pkill julia;pkill julia;pkill julia;pkill julia;pkill realtime;pkill realtime
+
+echo disable swapping
+free -m
+swapoff -a
+
+umount /dev/mmcblk0p*
+umount /sdcard/*
+
+
+
+
+
+
 swapoff -a
 umount /sdcard/*
 umount /dev/mmcblk0p*
@@ -48,7 +117,7 @@ else
       echo Formatting disk!  
 
 LC_ALL=C /sbin/sfdisk --force -uS --Linux /dev/mmcblk0 &lt;&lt;-__EOF__
-,10485760,0x83,*
+,16777216,0x83,*
 ,,0x83,*
 __EOF__
 

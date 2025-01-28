@@ -12,12 +12,12 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>IP address of the remote beaglebone.</description>
-          <defaultValue>192.168.81.81</defaultValue>
+          <defaultValue>192.168.68.190</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>download_prefix</name>
-          <defaultValue>http://192.168.81.39/download</defaultValue>
+          <defaultValue>http://192.168.68.110/download</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <com.syhuang.hudson.plugins.listgitbranchesparameter.ListGitBranchesParameterDefinition plugin="list-git-branches-parameter@0.0.13">

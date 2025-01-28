@@ -12,7 +12,7 @@
         <hudson.model.StringParameterDefinition>
           <name>build_machine</name>
           <description>Building machine</description>
-          <defaultValue>192.168.81.32</defaultValue>
+          <defaultValue>192.168.68.191</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>

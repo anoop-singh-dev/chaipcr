@@ -63,7 +63,7 @@ cd compile-browser/
 echo installing headers...
 uname=`uname -r`
 echo uname=$uname
-uname_updated=$(echo "$uname" | sed "s/chai-//")
+uname_updated=$(echo &quot;$uname&quot; | sed &quot;s/chai-//&quot;)
 echo updated to $uname_updated
 
 apt-get -y -q install linux-headers-$uname_updated || exit 1
@@ -77,7 +77,7 @@ apt-get install -y git make usbutils build-essential cmake curl pkg-config pytho
       <hideCommand>false</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
-      <command>echo "Shell used: $0"
+      <command>echo &quot;Shell used: $0&quot;
 
 tmp_folder=/tmp/gitter/$JOB_NAME/$BUILD_NUMBER
 echo working on $tmp_folder
@@ -86,18 +86,18 @@ cd  $tmp_folder
       
         echo Branch param $build_branch
         clean_build_branch=$build_branch
-        clean_build_branch=${clean_build_branch#"remotes/"}
-        clean_build_branch=${clean_build_branch#"branches/"}
-        clean_build_branch=${clean_build_branch#"refs/heads/"}
-        clean_build_branch=${clean_build_branch#"tags/"}
-        clean_build_branch=${clean_build_branch#"trunk"}
-        clean_build_branch=${clean_build_branch#"master"}
+        clean_build_branch=${clean_build_branch#&quot;remotes/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;branches/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;refs/heads/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;tags/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;trunk&quot;}
+        clean_build_branch=${clean_build_branch#&quot;master&quot;}
         echo Cleaned branch param $clean_build_branch
 
         branch_param=
         branch_name=
 
-        if [ -z $build_branch ] || ! [[ "$build_branch" == *\/* ]]  || [ "$build_branch" = "trunk" ]
+        if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
         then
                 echo No build branch chosen
         else
@@ -107,7 +107,7 @@ cd  $tmp_folder
                 then
                         echo Master branch chosen..
                 else
-                    branch_param="-b $branch_name"
+                    branch_param=&quot;-b $branch_name&quot;
                     echo Cloning branch and param $branch_name and $branch_param
                 fi
         fi
@@ -157,14 +157,14 @@ cd  $tmp_folder
         cd ..
         echo copying repo to $build_machine
         retry=0
-        until rsync --delete --rsh="sshpass ssh -o ServerAliveInterval=600 -oStrictHostKeyChecking=no -l root" -a ./chaipcr "$build_machine:/sdcard/factory/compile-browser/"
+        until rsync --delete --rsh=&quot;sshpass ssh -o ServerAliveInterval=600 -oStrictHostKeyChecking=no -l root&quot; -a ./chaipcr &quot;$build_machine:/sdcard/factory/compile-browser/&quot;
         do
           if [ $retry -gt 10 ]
           then
           		echo error copying files to device
                 exit 1
           fi
-          echo "Retrying in 5 seconds..."
+          echo &quot;Retrying in 5 seconds...&quot;
   		  sleep 5
           retry=$((retry+1))
         done
@@ -187,7 +187,7 @@ rm /sdcard/factory/compile-browser/chaipcr/realtime/libraries/lib/libboost*
 rm /sdcard/factory/compile-browser/chaipcr/realtime/libraries/lib/libsoci*
 
 /opt/QtEmbedded/bin/qmake || exit 1
-sed -i "s/arm-unknown-linux-gnueabi-//" Makefile
+sed -i &quot;s/arm-unknown-linux-gnueabi-//&quot; Makefile
 sed -i &apos;/^DEFINES[[:space:]]\+=/ s/$/ -DKERNEL_49/&apos; Makefile
 
 make || exit 1

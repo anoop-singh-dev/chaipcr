@@ -8,6 +8,7 @@
 - backup grepped image&#xd;
 - apply process_raw_image.sh and create_sdcard.sh scripts&#xd;
 - exports the sdcard as an image file&#xd;
+- It cannot go in parallel.&#xd;
 </description>
   <keepDependencies>false</keepDependencies>
   <properties>
@@ -26,7 +27,7 @@
           <description>The folder where to host download file. 
 Apache server: /var/www/html/download
 or 
-Nginx (as on 192.168.81.39): /usr/share/nginx/html/download
+Nginx (as on 192.168.68.110): /usr/share/nginx/html/download
 </description>
           <defaultValue>/usr/share/nginx/html/download</defaultValue>
           <trim>false</trim>
@@ -34,7 +35,7 @@ Nginx (as on 192.168.81.39): /usr/share/nginx/html/download
         <hudson.model.StringParameterDefinition>
           <name>download_prefix</name>
           <description>Download server url. Example: http://10.0.1.20/download</description>
-          <defaultValue>http://192.168.81.39/download</defaultValue>
+          <defaultValue>http://192.168.68.110/download</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>

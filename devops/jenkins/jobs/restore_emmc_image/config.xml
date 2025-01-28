@@ -47,7 +47,7 @@
     <hudson.tasks.Shell>
       <command>#!/bin/bash
 echo checking Jenkins server
-echo "Bash version ${BASH_VERSION}..."
+echo &quot;Bash version ${BASH_VERSION}...&quot;
 uname -a
 ls -ahl
 lsblk
@@ -60,10 +60,10 @@ sudo apt-get -y -q install sshpass parted mdadm --allow-unauthenticated
 sudo apt-get -y -q install dirmngr --install-recommends
 
 sudo chmod 777      /var/lib/jenkins/.ssh/known_hosts
-ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R $build_machine
-ssh-keygen -f "/home/jenkins/.ssh/known_hosts" -R $build_machine
+ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
+ssh-keygen -f &quot;/home/jenkins/.ssh/known_hosts&quot; -R $build_machine
 
-#ssh-keygen -f "/var/lib/jenkins/.ssh/known_hosts" -R $build_machine
+#ssh-keygen -f &quot;/var/lib/jenkins/.ssh/known_hosts&quot; -R $build_machine
 
 sshpass -p temppwd ssh -t -oStrictHostKeyChecking=no debian@$build_machine &lt;&lt;&apos;ENDSSH&apos;
 echo enable root access with no password
@@ -105,7 +105,7 @@ EOF
 fi
 
 echo deleting root password in case of chaipcr
-sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine "passwd -d -u root"
+sshpass -p chaipcr ssh -oStrictHostKeyChecking=no root@$build_machine &quot;passwd -d -u root&quot;
 
 if ssh -t -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
 
@@ -130,9 +130,9 @@ fi
 exit 0
 ENDSSH
 then
-   echo "-t worked"
+   echo &quot;-t worked&quot;
 else
-echo " trying -tt"
+echo &quot; trying -tt&quot;
 ssh -tt -oStrictHostKeyChecking=no root@$build_machine &lt;&lt;&apos;ENDSSH&apos;
 
 if grep diffie-hellman-group1-sha1 /etc/ssh/sshd_config
@@ -192,18 +192,18 @@ sleep 20</command>
 
         echo Branch param $build_branch
         clean_build_branch=$build_branch
-        clean_build_branch=${clean_build_branch#"remotes/"}
-        clean_build_branch=${clean_build_branch#"branches/"}
-        clean_build_branch=${clean_build_branch#"refs/heads/"}
-        clean_build_branch=${clean_build_branch#"tags/"}
-        clean_build_branch=${clean_build_branch#"trunk"}
-        clean_build_branch=${clean_build_branch#"master"}
+        clean_build_branch=${clean_build_branch#&quot;remotes/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;branches/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;refs/heads/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;tags/&quot;}
+        clean_build_branch=${clean_build_branch#&quot;trunk&quot;}
+        clean_build_branch=${clean_build_branch#&quot;master&quot;}
         echo Cleaned branch param $clean_build_branch
 
         branch_param=
         branch_name=
 
-        if [ -z $build_branch ] || ! [[ "$build_branch" == *\/* ]]  || [ "$build_branch" = "trunk" ]
+        if [ -z $build_branch ] || ! [[ &quot;$build_branch&quot; == *\/* ]]  || [ &quot;$build_branch&quot; = &quot;trunk&quot; ]
         then
                 echo No build branch chosen
         else
@@ -213,7 +213,7 @@ sleep 20</command>
                 then
                         echo Master branch chosen..
                 else
-                    branch_param="-b $branch_name"
+                    branch_param=&quot;-b $branch_name&quot;
                     echo Cloning branch and param $branch_name and $branch_param
                 fi
         fi
@@ -265,14 +265,58 @@ sleep 20</command>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@158.ve2a_e90fb_7319">
       <siteName>root@$build_machine:22</siteName>
-      <command>echo "Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}"
-echo "Slave Beaglebone at ${build_machine}"
+      <command>echo &quot;Building ${PROJECT_NAME} - Build # ${BUILD_NUMBER}.. result is at ${BUILD_URL}&quot;
+echo &quot;Slave Beaglebone at ${build_machine}&quot;
 echo checking build device 
-echo "Bash version ${BASH_VERSION}..."
+echo &quot;Bash version ${BASH_VERSION}...&quot;
 uname -a
 ls -ahl
 lsblk
 df -h
+
+
+pkill julia
+pkill julia
+pkill julia
+pkill julia
+pkill julia
+pkill julia
+
+# Extract PIDs related to &apos;sdcard&apos; using lsof
+for trys in {1..5}
+do
+echo Retry $trys
+for pid in $(lsof | grep sdcard | awk &apos;{print $2}&apos; | sort -u)
+do
+    echo &quot;Processing PID: $pid&quot;
+    # Perform any action on the PID, e.g., killing the process
+    sudo kill -9 &quot;$pid&quot; 2&gt;/dev/null &amp;&amp; echo &quot;Killed PID $pid&quot; || echo &quot;Failed to kill PID $pid&quot;
+done
+
+
+# Find all Julia processes and terminate them
+echo &quot;Searching for Julia processes...&quot;
+
+# Loop through each Julia process
+for pid in $(pgrep julia)
+do
+    echo &quot;Killing Julia process with PID: $pid&quot;
+    sudo kill -9 &quot;$pid&quot; 2&gt;/dev/null
+
+    # Check if the process was successfully killed
+    if ps -p &quot;$pid&quot; &gt; /dev/null
+    then
+        echo &quot;Failed to kill process $pid. Retrying...&quot;
+    else
+        echo &quot;Process $pid successfully terminated.&quot;
+    fi
+    sleep 20
+done
+done
+echo &quot;All Julia processes terminated.&quot;
+
+echo closing swap files
+sudo swapoff -a
 
 # debug markers 
 # mark=`date &apos;+%m_%d__%H_%M_%S&apos;`;mkdir -p /root/REST_B4_rootfs_${mark} /perm/REST_B4_perm_${mark} /data/REST_B4_data_${mark};sync
@@ -294,7 +338,7 @@ umount /sdcard/*
 lsblk
 if mount | grep mmcblk0
 then
-  echo "Error: can&apos;t unmount sdcard!"
+  echo &quot;Error: can&apos;t unmount sdcard!&quot;
   exit 1
 fi
 
@@ -390,7 +434,7 @@ df -h
 ulimit -t 1800
 export TMOUT=0
 
-echo "Restoring image: $input_image_prefix by restore job build number $BUILD_NUMBER , to this device starting at: " &gt;&gt; ~/restore_history.log
+echo &quot;Restoring image: $input_image_prefix by restore job build number $BUILD_NUMBER , to this device starting at: &quot; &gt;&gt; ~/restore_history.log
 date &gt;&gt; ~/restore_history.log
 
 
@@ -438,23 +482,23 @@ export TMOUT=0
 export MAX_RETRIES=5
 export RETRY_DELAY=5
 
-echo "first image send"
+echo &quot;first image send&quot;
 
 for i in 1 2 3 4 5
 do
-    echo "Attempt $i of $MAX_RETRIES"
+    echo &quot;Attempt $i of $MAX_RETRIES&quot;
     rsync  --no-owner --timeout=30 --partial --append-verify -avzP /tmp/restore/${BUILD_NUMBER}/eMMC_part1.img root@$build_machine:/tmp/grep_sdcard/ &amp;&amp; break
-    echo "Transfer failed. Retrying in $RETRY_DELAY seconds..."
+    echo &quot;Transfer failed. Retrying in $RETRY_DELAY seconds...&quot;
     sleep $RETRY_DELAY
 done
 
-echo "second image send"
+echo &quot;second image send&quot;
 
 for i in 1 2 3 4 5
 do
-    echo "Attempt $i of $MAX_RETRIES"
+    echo &quot;Attempt $i of $MAX_RETRIES&quot;
  	rsync  --no-owner --timeout=30 --partial --append-verify -avzP /tmp/restore/${BUILD_NUMBER}/eMMC_part2.img root@$build_machine:/tmp/grep_sdcard/ &amp;&amp; break
-    echo "Transfer failed. Retrying in $RETRY_DELAY seconds..."
+    echo &quot;Transfer failed. Retrying in $RETRY_DELAY seconds...&quot;
     sleep $RETRY_DELAY
 done
 
@@ -479,12 +523,12 @@ rm $emmc_image_latest_tmp_compressed || true
       <command>echo patching grep sdcard to boot only once
 #cp /tmp/grep_sdcard/autorun.sh /tmp/grep_sdcard/autorun.sh.org
 
-sed "s/reboot/rm \/mnt\/uEnv.txt ; reboot/" -i /tmp/grep_sdcard/autorun.sh
-sed "s/halt/rm \/mnt\/uEnv.txt ; reboot # /" -i /tmp/grep_sdcard/autorun.sh
-sed "s/restore=false/restore=true/" -i /tmp/grep_sdcard/pack_latest_version.sh
+sed &quot;s/reboot/rm \/mnt\/uEnv.txt ; reboot/&quot; -i /tmp/grep_sdcard/autorun.sh
+sed &quot;s/halt/rm \/mnt\/uEnv.txt ; reboot # /&quot; -i /tmp/grep_sdcard/autorun.sh
+sed &quot;s/restore=false/restore=true/&quot; -i /tmp/grep_sdcard/pack_latest_version.sh
 
-sed "s/reboot/rm \/mnt\/uEnv.txt ; reboot/" -i /tmp/grep_sdcard/pack_latest_version.sh
-sed "s/halt/rm \/mnt\/uEnv.txt ; reboot # /" -i /tmp/grep_sdcard/pack_latest_version.sh
+sed &quot;s/reboot/rm \/mnt\/uEnv.txt ; reboot/&quot; -i /tmp/grep_sdcard/pack_latest_version.sh
+sed &quot;s/halt/rm \/mnt\/uEnv.txt ; reboot # /&quot; -i /tmp/grep_sdcard/pack_latest_version.sh
 
 #mv /tmp/grep_sdcard/autorun.sh  /tmp/grep_sdcard/autorun.sh.tmp
 
@@ -510,7 +554,7 @@ echo waiting for a restart
 sleep 1200
 for i in {0..2400..60}
 do
-	echo "Waiting for the build device to become ready! $i"
+	echo &quot;Waiting for the build device to become ready! $i&quot;
 	sleep 60
     if ping $build_machine -c 3
     then
@@ -531,7 +575,7 @@ exit 1</command>
       <siteName>root@$build_machine:22</siteName>
       <command>if [ -e ~/restore_history.log ]
 then
-    echo "Restore job failed. Check the restore jobs mentioned in the history. The restore history of this device as below:"
+    echo &quot;Restore job failed. Check the restore jobs mentioned in the history. The restore history of this device as below:&quot;
     cat ~/restore_history.log
     exit 1
 fi
