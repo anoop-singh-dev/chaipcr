@@ -371,7 +371,7 @@ limitations under the License.
                 >
                   <span class="one-line-span" ng-attr-style="background-color: {{color_by == 'target' ? target.color : 'transparent'}};">{{target.name | truncate:5:1}} C<sub>q</sub></span>
                 </th>
-                <th class="CB4-M item-blank" width="0px" ></th>
+                <th class="CB4-M item-blank" width="0px" >Result</th>
               </tr>
             </thead>
             <tbody>
@@ -432,7 +432,15 @@ limitations under the License.
                     </span>
                   </span>
                 </td>
-                <td style="border-top-right-radius: 3px;border-bottom-right-radius: 3px;"></td>
+               <td style="border-top-right-radius: 3px; border-bottom-right-radius: 3px;">
+                <span
+                  ng-repeat="well_target in well_item.targets"
+                  ng-if="targetsSetHided[well_target.target_id]"
+                  style="display: block; color: {{ well_target.cq > 0 ? 'green' : 'red' }};"
+                >
+                  {{ well_target.cq > 0 ? 'Positive' : 'Negative' }}
+                </span>
+               </td>
               </tr>
             </tbody>
           </table>
