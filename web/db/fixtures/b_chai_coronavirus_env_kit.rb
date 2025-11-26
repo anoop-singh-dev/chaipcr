@@ -7,9 +7,10 @@ experiment_definition = ExperimentDefinition.seed(:guid) do |s|
       {
         stage: {
           stage_type:"holding", steps: [
-            { step: { name:"UNG Digestion",temperature:25,hold_time:300 } },
-            { step: { name:"Reverse Transcription",temperature:62,hold_time:300 } },
-            { step: { name:"Initial Denaturing",temperature:95,hold_time:30 } }
+            # { step: { name:"UNG Digestion",temperature:25,hold_time:300 } },
+            # { step: { name:"Reverse Transcription",temperature:62,hold_time:300 } },
+            # { step: { name:"Initial Denaturing",temperature:95,hold_time:30 } }
+            { step: { name: "Initial Polymerase Activation/DNA Denaturation", temperature: 95, hold_time: 30 } } 
           ]
         }
       },
@@ -18,13 +19,13 @@ experiment_definition = ExperimentDefinition.seed(:guid) do |s|
           stage_type:"cycling",
           num_cycles: 40,
           steps: [
-            { step: { name:"Denature", temperature:95, hold_time:10 } },
-            { step: { name:"Anneal", temperature:62, hold_time:40, collect_data:true } }
+            { step: { name:"Denature", temperature:95, hold_time:4 } },
+            { step: { name:"Anneal", temperature:67, hold_time:18, collect_data:true } }
           ]
         }
       }
     ]
-  }
+  } 
 end
 
 # set the protocol lid temperature to 110

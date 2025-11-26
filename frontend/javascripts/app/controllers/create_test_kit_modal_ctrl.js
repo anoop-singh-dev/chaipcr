@@ -17,7 +17,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
             {
                 name: "chai",
                 guid: 'chai_coronavirus_env_kit',
-                logo: '/images/Chai Badge.svg',
+                logo: '/images/SalivIQLogo_.png',
             },
             // {
             //     name: "neogen",
@@ -29,30 +29,30 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
             //     guid: '',
             //     logo: '/images/nephros.png',
             // },
-            {
-                name: "pika",
-                guid: 'pika_4e_kit',
-                logo: '/images/PIKA Logo Vector.svg',
-            },
+            // {
+            //     name: "pika",
+            //     guid: 'pika_4e_kit',
+            //     logo: '/images/PIKA Logo Vector.svg', 
+            // },
         ];
 
         $scope.test_kit_set = {
             chai: {
-                title: 'Chai Test Kits',
+                title: 'SalivIQ™ Test Kits',
                 categories: [],
                 kits: [
                     {
                         kit_id: 'coronavirus-env-surface',
-                        name: 'Coronavirus Environmental Surface',
+                        name: 'SalivIQ™ Strep A',
                         guid: 'chai_coronavirus_env_kit',
                         target_name: 'SARS-CoV-2'
                     },
-                    {
-                        kit_id: 'covid-19-surveillance',
-                        name: 'COVID-19 Surveillance',
-                        guid: 'chai_covid19_surv_kit',
-                        target_name: 'SARS-CoV-2'
-                    },
+                    // {
+                    //     kit_id: 'covid-19-surveillance',
+                    //     name: 'COVID-19 Surveillance',
+                    //     guid: 'chai_covid19_surv_kit',
+                    //     target_name: 'SARS-CoV-2'
+                    // },
                 ],
             },
             pika: {

@@ -28,5 +28,5 @@ end
 # set the protocol lid temperature to 110
 protocol = Protocol.seed(:experiment_definition_id) do |s|
   s.lid_temperature = 110
-  s.experiment_definition_id = experiment_definition[0].id
+  s.experiment_definition_id = experiment_definition[0].id 
 end
