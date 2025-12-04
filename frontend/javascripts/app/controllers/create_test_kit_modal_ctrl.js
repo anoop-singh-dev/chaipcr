@@ -17,7 +17,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
             {
                 name: "chai",
                 guid: 'chai_coronavirus_env_kit',
-                logo: '/images/SalivIQLogo_.png',
+                logo: '/images/SalivIQ_Strep_A_Logo.png',
             },
             // {
             //     name: "neogen",

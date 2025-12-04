@@ -134,7 +134,7 @@
           getExperiment($scope.experimentId, function(exp){
             $scope.initial_done = true;
             switch($scope.experiment.guid){
-              case 'chai_coronavirus_env_kit':
+              case 'chai_coronavirus_env_kit': 
                 target2_name = ['IAC'];
                 break;
               case 'chai_covid19_surv_kit':
