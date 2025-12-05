@@ -14,11 +14,11 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
 
         $scope.modal_title = "Choose Kit Manufacturer";
         $scope.brands = [
-            {
-                name: "chai",
-                guid: 'chai_coronavirus_env_kit',
-                logo: '/images/SalivIQ_Strep_A_Logo.png',
-            },
+            // {
+            //     name: "chai",
+            //     guid: 'chai_coronavirus_env_kit',
+            //     logo: '/images/SalivIQ_Strep_A_Logo.png',
+            // },
             // {
             //     name: "neogen",
             //     guid: '',
@@ -29,21 +29,21 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
             //     guid: '',
             //     logo: '/images/nephros.png',
             // },
-            // {
-            //     name: "pika",
-            //     guid: 'pika_4e_kit',
-            //     logo: '/images/PIKA Logo Vector.svg', 
-            // },
+            {
+                name: "pika",
+                guid: 'pika_4e_kit',
+                logo: '/images/SalivIQ_Strep_A_Logo.png', 
+            },
         ];
 
         $scope.test_kit_set = {
             chai: {
-                title: 'SalivIQ™ Test Kits',
+                title: 'Chai Test Kits',
                 categories: [],
                 kits: [
                     {
                         kit_id: 'coronavirus-env-surface',
-                        name: 'SalivIQ™ Strep A',
+                        name: 'Coronavirus Environmental Surface',
                         guid: 'chai_coronavirus_env_kit',
                         target_name: 'SARS-CoV-2'
                     },
@@ -56,73 +56,73 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                 ],
             },
             pika: {
-                title: 'PIKA Weihenstephan Test Kits',
-                categories: ["Bacteria 4e Kits", "Yeast 4e Kits"],
+                title: 'SalivIQ™ Test Kits',
+                categories: [],
                 kits: [
                     //Bacteria 4e Kits
                     {
-                        name: 'Acetics screening',
+                        name: 'SalivIQ™ Strep A',
                         kit_id: '2401-15',
                         category: 'Bacteria 4e Kits'
                     },
-                    {
-                        name: 'Alicyclobacillus screening',
-                        kit_id: '2401-18',
-                        category: 'Bacteria 4e Kits'
-                    },
-                    {
-                        name: 'Lactobacillaceae screening',
-                        kit_id: '2401-32',
-                        category: 'Bacteria 4e Kits'
-                    },
-                    {
-                        name: 'L. acetotolerans detection',
-                        kit_id: '2401-52',
-                        category: 'Bacteria 4e Kits'
-                    },
-                    {
-                        name: 'LP Real Beer Spoiler Identification',
-                        kit_id: '2401-37',
-                        category: 'Bacteria 4e Kits',
-                        guid: 'pika_4e_lp_identification_kit'
-                    },
-                    {
-                        name: 'LP Real Beer Spoiler screening',
-                        kit_id: '2401-38',
-                        category: 'Bacteria 4e Kits'
-                    },
-                    {
-                        name: 'Megasphaera screening',
-                        kit_id: '2401-41',
-                        category: 'Bacteria 4e Kits'
-                    },
-                    {
-                        name: 'Pectinatus screening',
-                        kit_id: '2401-44',
-                        category: 'Bacteria 4e Kits'
-                    },
-                    {
-                        name: 'Single spoiler detection',
-                        kit_id: '2401-NN',
-                        category: 'Bacteria 4e Kits'
-                    },
+                    // {
+                    //     name: 'Alicyclobacillus screening',
+                    //     kit_id: '2401-18',
+                    //     category: 'Bacteria 4e Kits'
+                    // },
+                    // {
+                    //     name: 'Lactobacillaceae screening',
+                    //     kit_id: '2401-32',
+                    //     category: 'Bacteria 4e Kits'
+                    // },
+                    // {
+                    //     name: 'L. acetotolerans detection',
+                    //     kit_id: '2401-52',
+                    //     category: 'Bacteria 4e Kits'
+                    // },
+                    // {
+                    //     name: 'LP Real Beer Spoiler Identification',
+                    //     kit_id: '2401-37',
+                    //     category: 'Bacteria 4e Kits',
+                    //     guid: 'pika_4e_lp_identification_kit'
+                    // },
+                    // {
+                    //     name: 'LP Real Beer Spoiler screening',
+                    //     kit_id: '2401-38',
+                    //     category: 'Bacteria 4e Kits'
+                    // },
+                    // {
+                    //     name: 'Megasphaera screening',
+                    //     kit_id: '2401-41',
+                    //     category: 'Bacteria 4e Kits'
+                    // },
+                    // {
+                    //     name: 'Pectinatus screening',
+                    //     kit_id: '2401-44',
+                    //     category: 'Bacteria 4e Kits'
+                    // },
+                    // {
+                    //     name: 'Single spoiler detection',
+                    //     kit_id: '2401-NN',
+                    //     category: 'Bacteria 4e Kits'
+                    // },
 
                     //Yeast 4e Kits
-                    {
-                        name: 'Brettanomyces (Dekkera) screening',
-                        kit_id: '2402-20',
-                        category: 'Yeast 4e Kits'
-                    },
-                    {
-                        name: 'S. diastaticus detection',
-                        kit_id: '2402-49',
-                        category: 'Yeast 4e Kits'
-                    },
-                    {
-                        name: 'Superattenuator yeasts screening',
-                        kit_id: '2402-58',
-                        category: 'Yeast 4e Kits'
-                    },
+                    // {
+                    //     name: 'Brettanomyces (Dekkera) screening',
+                    //     kit_id: '2402-20',
+                    //     category: 'Yeast 4e Kits'
+                    // },
+                    // {
+                    //     name: 'S. diastaticus detection',
+                    //     kit_id: '2402-49',
+                    //     category: 'Yeast 4e Kits'
+                    // },
+                    // {
+                    //     name: 'Superattenuator yeasts screening',
+                    //     kit_id: '2402-58',
+                    //     category: 'Yeast 4e Kits'
+                    // },
                 ],
             },
         };

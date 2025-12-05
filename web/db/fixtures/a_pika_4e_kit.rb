@@ -7,7 +7,7 @@ experiment_definition = ExperimentDefinition.seed(:guid) do |s|
       {
         stage: {
           stage_type:"holding", steps: [
-            { step: { name:"Initial Denaturing",temperature:95,hold_time:120 } }
+            { step: { name: "Initial Polymerase Activation/DNA Denaturation", temperature: 95, hold_time: 30 } } 
           ]
         }
       },
@@ -16,8 +16,8 @@ experiment_definition = ExperimentDefinition.seed(:guid) do |s|
           stage_type:"cycling",
           num_cycles: 40,
           steps: [
-            { step: { name:"Denaturing", temperature:95, hold_time:15, ramp:{rate:2.0} } },
-            { step: { name:"Annealing", temperature:60, hold_time:60, collect_data:true, ramp:{rate:2.0} } }
+            { step: { name:"Denaturing", temperature:95, hold_time:4, ramp:{rate:5.0} } },
+            { step: { name:"Annealing", temperature:67, hold_time:18, collect_data:true, ramp:{rate:5.0} } }
           ]
         }
       }

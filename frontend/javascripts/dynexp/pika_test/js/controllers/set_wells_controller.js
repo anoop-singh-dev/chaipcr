@@ -105,7 +105,7 @@
                   $scope.target_ipc = resp.data[i].target;
                   switch($scope.target_ipc.name){
                     case 'IAC':
-                      $scope.target1_name = 'Coronavirus Environmental Surface';
+                      $scope.target1_name = 'SalivIQ Environmental Surface';
                       break;
                     case 'RPLP0':
                       $scope.target1_name = 'COVID-19 Surveillance';

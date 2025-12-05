@@ -32,7 +32,7 @@
 			<div class="kit-header">
 				<div class="kit-selector">
 					<label class="CX5-M" ng-click="onSelectKitType('one')" ng-class="{active: current_kit_type == 'one'}">One Kit</label>
-					<label class="CX5-M" ng-click="onSelectKitType('two')" ng-class="{active: current_kit_type == 'two'}">Two Kits</label>
+					<!-- <label class="CX5-M" ng-click="onSelectKitType('two')" ng-class="{active: current_kit_type == 'two'}">Two Kits</label> -->
 				</div>
 			</div>
 			<div class="kit-list">
@@ -43,7 +43,7 @@
 						<td class="CX5">Kit Name</td>
 						<td></td>
 					</tr>
-					<tr><td></td><td ng-if="current_kit_type == 'two'"></td><td class="CX5-M">Bacteria 4e Kits</td></tr>
+					<!-- <tr><td></td><td ng-if="current_kit_type == 'two'"></td><td class="CX5-M">Bacteria 4e Kits</td></tr> -->
 					<tr ng-repeat="item in test_kits" ng-if="item.category == 'Bacteria 4e Kits' && !(current_kit_type == 'two' && item.guid)">
 						<td>
 							<div class="checkbox-wrapper CX5" ng-click="onSelectKit1(item)" ng-class="{ 'selected': item.name == selected_kit_1.name}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
@@ -55,9 +55,9 @@
 							<label class="CX5"
 								ng-class="{active: item.name == selected_kit_1.name}">{{item.name}}</label>
 						</td>
-						<td class="CX5">({{item.kit_id}})</td>
+						<!-- <td class="CX5">({{item.kit_id}})</td> -->
 					</tr>
-					<tr><td></td><td ng-if="current_kit_type == 'two'"></td><td class="CX5-M">Yeast 4e Kits</td></tr>
+					<!-- <tr><td></td><td ng-if="current_kit_type == 'two'"></td><td class="CX5-M">Yeast 4e Kits</td></tr> -->
 					<tr ng-repeat="item in test_kits" ng-if="item.category == 'Yeast 4e Kits'">
 						<td>
 							<div class="checkbox-wrapper CX5" ng-click="onSelectKit1(item)" ng-class="{ 'selected': item.name == selected_kit_1.name}"><label class="outer-line"><lable class="inner-line"></lable></label></div>
@@ -70,7 +70,7 @@
 								ng-class="{active: item.name == selected_kit_1.name}" 
 								ng-click="onSelectKit1(item)">{{item.name}}</label>
 						</td>
-						<td class="CX5">({{item.kit_id}})</td>
+						<!-- <td class="CX5">({{item.kit_id}})</td> -->
 					</tr>
 				</table>	
 			</div>
