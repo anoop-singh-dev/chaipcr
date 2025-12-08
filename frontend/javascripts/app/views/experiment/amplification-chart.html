@@ -364,14 +364,14 @@ limitations under the License.
                 <th class="CB4-M item-center" width="50px">Clr</th>
                 <th class="CB4-M item-center" width="50px" >Well</th>
                 <th class="CB4-M resizable" width="240px" ><span class="one-line-span">Sample</span></th>
+                <th class="CB4-M item-blank" width="100px" >Test Result</th>
                 <th class="CB4-M item-right target-header resizable" 
                     width="105px" 
                     ng-repeat="target in targetsSet"
                     ng-if="targetsSetHided[target.id]"
                 >
-                  <span class="one-line-span" ng-attr-style="background-color: {{color_by == 'target' ? target.color : 'transparent'}};">{{target.name | truncate:5:1}} C<sub>q</sub></span>
+                  <span class="one-line-span" ng-attr-style="background-color: {{color_by == 'target' ? target.color : 'transparent'}};">C<sub>q</sub></span>
                 </th>
-                <th class="CB4-M item-blank" width="0px" >Result</th>
               </tr>
             </thead>
             <tbody>
@@ -408,6 +408,16 @@ limitations under the License.
                 <td class="CB4">
                   <span class="one-line-span" uib-tooltip="{{samples[well_item.well_num - 1].name}}">{{samples[well_item.well_num - 1].name}}</span>
                 </td>
+                <td class="CB4 item-right" style="border-top-right-radius: 3px; border-bottom-right-radius: 3px;">
+                  <span
+                    ng-style="{ 
+                      'color': hasPositiveResult(well_item) ? 'green' : 'red',
+                      'font-weight': 'bold'
+                    }"
+                  >
+                    {{ hasPositiveResult(well_item) ? 'POSITIVE' : 'NEGATIVE' }}
+                  </span>
+                </td>
                 <td 
                   class="CB4 item-right target-cell" 
                   ng-class="{
@@ -424,26 +434,14 @@ limitations under the License.
                     class="CB4 one-line-span"
                     ng-attr-style="border-color: {{well_target.color}}"
                   >
-                    <span class="CB4" ng-show="well_target.cq > 0">
+                    <span class="CB4" ng-show="well_target.cq > 12">
                       {{well_target.cq | round:2}}
                     </span>
-                    <span class="CB4" ng-show="well_target.cq <= 0">
+                    <span class="CB4" ng-show="well_target.cq <= 12">
                       <span class="CB4 dummy-placeholder">&nbsp;</span>
                     </span>
                   </span>
                 </td>
-                <td style="border-top-right-radius: 3px; border-bottom-right-radius: 3px;">
-                  <span
-                  ng-repeat="well_target in well_item.targets"
-                  ng-if="targetsSetHided[well_target.target_id]"
-                  ng-style="{ 
-                    'display': 'block', 
-                    'color': well_target.cq > 12 ? 'green' : 'red' 
-                  }"
-                >
-                  {{ well_target.cq > 12 ? 'Positive' : 'Negative' }}
-                </span>
-                 </td>
               </tr>
             </tbody>
           </table>
