@@ -601,16 +601,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         else 
           $scope.bgcolor_target = { 'background-color':'#666' }
 
-      
-     $scope.hasPositiveResult = (well_item) ->
-        return false if !well_item.targets
-
-        for target in well_item.targets
-          if $scope.targetsSetHided[target.target_id] and target.cq > 12
-            return true
-
-        return false
-
       $scope.onSelectRow = (well_item, index) ->
         for well_i in [0..$scope.well_data.length - 1]
           $scope.well_data[well_i].highlight = false
@@ -910,6 +900,16 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.showAmpliChart = false
           $scope.showStandardChart = false
 
+      # Add hasPositiveResult here at the end
+      $scope.hasPositiveResult = (well_item) ->
+        return false if !well_item.targets
+
+        for target in well_item.targets
+          if $scope.targetsSetHided[target.target_id] and target.cq > 12
+            return true
+
+        return false
+
       $scope.$on '$destroy', ->
         $interval.cancel(retryInterval) if retryInterval
 
@@ -950,5 +950,8 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         else
           angular.element(document.querySelector('.chart-screens-container')).animate { scrollLeft: 0 }, 'fast'
         return
+
+
+        
 
 ]
