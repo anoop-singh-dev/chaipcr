@@ -1,4 +1,3 @@
-ExperimentDefinition.delete_all
 experiment_definition = ExperimentDefinition.seed(:guid) do |s|
   s.guid = "pika_4e_kit"
   s.experiment_type = ExperimentDefinition::TYPE_TESTKIT
