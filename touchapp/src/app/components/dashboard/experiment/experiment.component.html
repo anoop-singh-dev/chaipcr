@@ -21,7 +21,7 @@
     <div class="warning-message">
       <img [src]="isConfirmStop ? '/assets/images/touch/alert-dark-border.svg' : '/assets/images/touch/alert-red-border.svg'" class="warning-icon">
       <p class="CX3">
-        <span class="CX3-M">Experiment in progress</span><br/>
+        <span class="CX3-M">Test in progress</span><br/>
         Please do not open lid
       </p>
     </div>
@@ -50,7 +50,7 @@
       {{ timeRemaining * 1000 | date:'hh:mm:ss'}}
     </span>
     <div class="button-box" clickOutside (clickOutside)="isConfirmStop=false">
-      <button class="ch-button CX3-M" (click)="onStopExp()">{{isConfirmStop ? 'Confirm Stop' : 'Stop Experiment'}}</button>
+      <button class="ch-button CX3-M" (click)="onStopExp()">{{isConfirmStop ? 'Confirm Stop' : 'Stop Test'}}</button>
     </div>    
   </div>
 </div>

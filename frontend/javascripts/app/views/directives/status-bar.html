@@ -21,7 +21,7 @@
     <span class="idle-state">Machine is idle</span>
   </div>
   <div class="left-content" ng-show="state !== 'idle'">
-    <span>Experiment in Progress:&nbsp;</span>
+    <span>Test in Progress:&nbsp;</span>
     <span ng-show="footer_experiment.type !== 'test_kit'" class="experiment-name CB2-B mr-20" ui-sref="run-experiment({id: footer_experiment.id, chart: 'amplification'})">
       {{footer_experiment.name}}
     </span>
@@ -47,7 +47,7 @@
     </span>
     <div class="control" ng-show="(footer_experiment.started_at) && (!footer_experiment.completed_at || is_holding) && state !== 'idle' && !stop_confirm_show" ng-click="stopConfirm()">
       <img src="/images/status-bar-stop-btn.png">
-      <span ng-show="!is_holding">Stop Experiment</span>
+      <span ng-show="!is_holding">Stop Test</span>
       <span ng-show="is_holding">End Hold</span>
     </div>
     <div ng-click="stopExperiment()" class="control stop-confirm" ng-show="(footer_experiment.started_at) && (!footer_experiment.completed_at || is_holding) && state !== 'idle' && stop_confirm_show">
