@@ -16,7 +16,7 @@
 
     <!-- begin is valid -->
     <div class="right-content CB2-B" ng-if="experiment.id && !experiment.started_at && !experiment.completed_at && !(statusData.optics.lid_open==='true')&& state==='idle'">
-      <button id="start-experiment-button" ng-if="!start_confirm_show" class="button-header begin" ng-click="startConfirm()">Start Experiment</button>
+      <button id="start-experiment-button" ng-if="!start_confirm_show" class="button-header begin" ng-click="startConfirm()">Start Test</button>
       <button id="start-experiment-button" ng-if="start_confirm_show" class="button-he begin" ng-click="startExperiment()">Confirm Start</button>
     </div>
 
@@ -25,7 +25,7 @@
 
     <!-- begin is invalid ANOTHER EXP RUNNING -->
     <div class="right-content CB2-M text-shadow" ng-if="!experiment.started_at && !experiment.completed_at && (state !== 'idle') && !isCurrentExp">
-      Another experiment is running
+      Another test is running
       <span class="CB1-B ml-10 cursor-pointer" ui-sref="run-experiment({id: statusData.experiment_controller.experiment.id, chart: 'amplification'})">View Now</span>
     </div>
 
@@ -97,7 +97,7 @@
             !isStarted && !(state !== 'idle' && isCurrentExp) && (dataAnalysis || !enterState)">
       <span class="failed mr-10" ng-if="experiment.completion_status === 'aborted'">User cancelled</span>
       <span class="failed mr-10" ng-if="experiment.completion_status !== 'aborted'">Failed</span>
-      <button class="button-header ml-10" duplicate-experiment experiment-id="experiment.id">Duplicate Experiment</button>
+      <button class="button-header ml-10" duplicate-experiment experiment-id="experiment.id">Duplicate Test</button>
     </div>
   </div>
 </div>

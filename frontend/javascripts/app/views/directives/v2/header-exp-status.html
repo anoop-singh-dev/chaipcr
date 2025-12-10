@@ -19,7 +19,7 @@
 
     <!-- begin is invalid ANOTHER EXP RUNNING -->
     <div class="right-content CB2-M text-shadow" ng-if="!experiment.started_at && !experiment.completed_at && (state !== 'idle') && !isCurrentExp">
-      Another experiment is running
+      Another test is running
       <span class="CB1-B ml-10 cursor-pointer" ui-sref="run-experiment({id: statusData.experiment_controller.experiment.id, chart: 'amplification'})">View Now</span>
     </div>
 
