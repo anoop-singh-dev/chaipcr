@@ -365,11 +365,7 @@ limitations under the License.
                 <th class="CB4-M item-center" width="50px" >Well</th>
                 <th class="CB4-M resizable" width="240px" ><span class="one-line-span">Sample</span></th>
                 <th class="CB4-M item-blank" width="100px" >Test Result</th>
-                <th class="CB4-M item-right target-header resizable" 
-                    width="105px" 
-                    ng-repeat="target in targetsSet"
-                    ng-if="targetsSetHided[target.id]"
-                >
+                <th class="CB4-M item-right target-header resizable" width="105px" >
                   <span class="one-line-span" ng-attr-style="background-color: {{color_by == 'target' ? target.color : 'transparent'}};">C<sub>q</sub></span>
                 </th>
               </tr>
