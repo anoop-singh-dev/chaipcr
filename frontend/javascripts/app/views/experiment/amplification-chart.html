@@ -184,7 +184,7 @@ limitations under the License.
                 </div>
                 <div class="target-box">                    
                   <table class="targets-table">
-                    <tr ng-repeat="target in targetsSet">
+                    <tr ng-repeat="target in targetsSet" ng-if="target.name !== 'IPC'">
                       <td ng-if="color_by=='target'">
                         <span class="dot" ng-attr-style="background-color: {{target.color}};"></span>
                       </td>
@@ -206,7 +206,7 @@ limitations under the License.
           <div class="header CB4-M">Targets</div>
           <div class="target-container">
             <div class="target-list">
-              <div class="target-line" ng-repeat="target in targetsSet">
+              <div class="target-line" ng-repeat="target in targetsSet" ng-if="target.name !== 'IPC'">
                 <div class="target-name">
                   <label class="dot" ng-attr-style="background-color: {{target.color}};"></label>
                   {{target.name}}
@@ -269,7 +269,7 @@ limitations under the License.
                   highlight: well_item.highlight,
                   omitted: (omittedIndexes.indexOf(well_item.well_num.toString() + '_' + well_item.channel.toString()) != -1)
                 }"
-                ng-if="well_item.target_id"
+                ng-if="well_item.target_id && well_item.target_name !== 'IPC'"
                 ng-mousemove="onHoverRow($event, well_item, $index)"
                 class="well-item-row"
               >

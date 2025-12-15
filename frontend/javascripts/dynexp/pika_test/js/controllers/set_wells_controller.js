@@ -93,7 +93,7 @@
                 break;
               case 'pika_4e_kit':
                 target2_name = ['IPC'];
-                $scope.is_omittable = true;
+                $scope.is_omittable = false;
                 break;
             }
 
