@@ -47,7 +47,7 @@
       $scope.target1_name = '';
 
       $scope.is_loading = true;
-      $scope.is_omittable = false;
+      $scope.is_omittable = true;
 
       var target2_name = ['IPC'];
 
@@ -93,7 +93,7 @@
                 break;
               case 'pika_4e_kit':
                 target2_name = ['IPC'];
-                $scope.is_omittable = false;
+                $scope.is_omittable = true;
                 break;
             }
 
@@ -419,9 +419,8 @@
       }
 
       $scope.isControlWell = function(sample, index, well_row){
-        // var type_index = (well_row == 'A') ? index : index + 8;
-        // return ($scope.well_types[type_index] == 'positive_control' || $scope.well_types[type_index] == 'negative_control');
-        return false;
+        var type_index = (well_row == 'A') ? index : index + 8;
+        return ($scope.well_types[type_index] == 'positive_control' || $scope.well_types[type_index] == 'negative_control');
       };
 
       $scope.learnMoreClick = function(is_positive){

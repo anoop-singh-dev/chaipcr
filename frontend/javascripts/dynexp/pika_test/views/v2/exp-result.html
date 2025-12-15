@@ -37,7 +37,7 @@
               <td ng-if="$index >= 8">B{{$index - 7}}</td>
               <td class="CB2-M">{{x.name}}</td>
 
-              <td ng-if="$index < 2" class="text-center">
+              <!-- <td ng-if="$index < 2" class="text-center">
                 <img ng-show="result[$index] == 'Valid'" style="width:20px"  src="/images/Valid.svg">
                 <img ng-show="result[$index] == 'Invalid'" style="width:20px"  src="/images/Invalid.svg">
               </td>
@@ -47,7 +47,7 @@
                 <img ng-show="result[$index] == 'Inhibited'" style="width:20px"  src="/images/Inhibited.svg">
                 <img ng-show="result[$index] == 'Unknown'" style="width:20px"  src="/images/Inhibited.svg">
                 <img ng-show="result[$index] == 'Invalid'" style="width:20px"  src="/images/Invalid.svg">
-              </td>
+              </td> -->
               <td style="white-space: nowrap;" ng-if="famCq[$index] >= 12">Positive</td>
               <td style="white-space: nowrap;" ng-if="famCq[$index] < 12">Negative</td>
               <td class="text-center"><span ng-show="famCq[$index]">{{famCq[$index] | round:2}}</span></td>
