@@ -347,19 +347,19 @@
       function assignControlSample(is_positive){
         var omit_control = false;
         var omit_sample_index = 0;
-        var omit_sample_name = 'Positive Control';
+        var omit_sample_name = '';
         var omit_well_type = 'positive_control';
         if(is_positive){
           $scope.omit_positive = !$scope.omit_positive;
           omit_control = $scope.omit_positive;
           omit_sample_index = 0;
-          omit_sample_name = 'Positive Control';
+          omit_sample_name = '';
           omit_well_type = 'positive_control';
         } else {
           $scope.omit_negative = !$scope.omit_negative;
           omit_control = $scope.omit_negative;
           omit_sample_index = 1;
-          omit_sample_name = 'Negative Control';
+          omit_sample_name = '';
           omit_well_type = 'negative_control';
         }
 
