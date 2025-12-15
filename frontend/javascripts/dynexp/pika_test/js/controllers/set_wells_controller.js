@@ -347,19 +347,19 @@
       function assignControlSample(is_positive){
         var omit_control = false;
         var omit_sample_index = 0;
-        var omit_sample_name = '';
+        var omit_sample_name = 'Positive Control';
         var omit_well_type = 'positive_control';
         if(is_positive){
           $scope.omit_positive = !$scope.omit_positive;
           omit_control = $scope.omit_positive;
           omit_sample_index = 0;
-          omit_sample_name = '';
+          omit_sample_name = 'Positive Control';
           omit_well_type = 'positive_control';
         } else {
           $scope.omit_negative = !$scope.omit_negative;
           omit_control = $scope.omit_negative;
           omit_sample_index = 1;
-          omit_sample_name = '';
+          omit_sample_name = 'Negative Control';
           omit_well_type = 'negative_control';
         }
 
@@ -419,11 +419,9 @@
       }
 
       $scope.isControlWell = function(sample, index, well_row){
-        var type_index = (well_row == 'A') ? index : index + 8;  
-        var well_type = $scope.well_types[type_index];  
-        var is_positive_control = (well_type == 'positive_control' && !$scope.omit_positive);  
-        var is_negative_control = (well_type == 'negative_control' && !$scope.omit_negative);  
-        return (is_positive_control || is_negative_control);  
+        // var type_index = (well_row == 'A') ? index : index + 8;
+        // return ($scope.well_types[type_index] == 'positive_control' || $scope.well_types[type_index] == 'negative_control');
+        return false;
       };
 
       $scope.learnMoreClick = function(is_positive){
