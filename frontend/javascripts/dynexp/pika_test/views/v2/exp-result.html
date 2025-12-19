@@ -24,19 +24,19 @@
             <tr class="CX5-M tr-header">
               <td style="width:35px">Well</td>
               <td>{{result_header}}</td>
-              <td style="width:35px"></td>
+              <!-- <td style="width:35px"></td> -->
               <td style="width:150px; white-space: nowrap;">Result</td>
               <td class="text-center" style="width:100px">C<sub>q</sub></td>
               <!-- <td class="text-center" style="width:150px">Quantity</td> -->
               <td style="width:50px"></td>
             </tr>
-
+            
             <tr ng-if="x && (x.name != '' && x.name != 'empty') && ((twoKits && $index < 8) || !twoKits)" 
               ng-repeat="x in samples track by $index">
               <td ng-if="$index < 8">A{{$index + 1}}</td>
               <td ng-if="$index >= 8">B{{$index - 7}}</td>
               <td class="CB2-M">{{x.name}}</td>
-
+            
               <!-- <td ng-if="$index < 2" class="text-center">
                 <img ng-show="result[$index] == 'Valid'" style="width:20px"  src="/images/Valid.svg">
                 <img ng-show="result[$index] == 'Invalid'" style="width:20px"  src="/images/Invalid.svg">
@@ -48,6 +48,7 @@
                 <img ng-show="result[$index] == 'Unknown'" style="width:20px"  src="/images/Inhibited.svg">
                 <img ng-show="result[$index] == 'Invalid'" style="width:20px"  src="/images/Invalid.svg">
               </td> -->
+              
               <td style="white-space: nowrap;" ng-if="famCq[$index] >= 12">Positive</td>
               <td style="white-space: nowrap;" ng-if="famCq[$index] < 12">Negative</td>
               <td class="text-center"><span ng-show="famCq[$index] && famCq[$index] >= 12">{{famCq[$index] | round:2}}</span></td>
@@ -59,8 +60,9 @@
                 <img style="width:20px" src="/images/dynexp/pika-test/note-off.svg" class="cursor-pointer note-{{$index}}">
               </td>
             </tr>
+            
             <tr ng-if="twoKits" class="target-name">
-              <td colspan="7">
+              <td colspan="5">
                 <h3 class="CH1">{{targets[1].name}}</h3>
               </td>
             </tr>
