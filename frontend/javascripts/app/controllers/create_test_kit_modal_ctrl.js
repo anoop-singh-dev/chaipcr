@@ -287,6 +287,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                 });
 
                 // Negetive Control
+                if(sample2_name) {
                 tasks.push(function(cb) {
                     Experiment.createSample(new_experiment_id,{name: sample2_name}).then(function(resp) {
                         $scope.sample_negative_2 = resp.data.sample;
@@ -300,6 +301,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                     });
 
                 });
+               }
 
                 // Target 1
                 tasks.push(function(cb) {
@@ -365,7 +367,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                                 break;
                         }
                         $scope.$close();
-                    }
+                    } 
                 });
             });
         };
