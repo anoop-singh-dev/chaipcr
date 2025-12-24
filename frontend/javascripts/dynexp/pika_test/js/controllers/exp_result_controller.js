@@ -246,6 +246,40 @@
         $scope.modalInstance.close();
       };
 
+      $scope.isA1Invalid = function() {
+        if ($scope.famCq && $scope.famCq.length > 0) {
+          var a1Cq = $scope.famCq[0];
+          if (a1Cq && a1Cq > 0 && a1Cq < 15) {
+            return true;
+          }
+        }
+        return false;
+      };
+
+      $scope.getResultStatus = function(index) {
+        if ($scope.isA1Invalid()) {
+          return 'INVALID';
+        }
+        
+        if ($scope.famCq[index] && $scope.famCq[index] >= 15) {
+          return 'POSITIVE';
+        } else if ($scope.famCq[index] && $scope.famCq[index] < 15) {
+          return 'NEGATIVE';
+        }
+        return '';
+      };
+      $scope.getResultColor = function(index) {
+        var status = $scope.getResultStatus(index);
+        if (status === 'INVALID') {
+          return 'orange';
+        } else if (status === 'POSITIVE') {
+          return '#00AA00';
+        } else if (status === 'NEGATIVE') {
+          return '#FF0000';
+        }
+        return '#000000';
+      };
+
     }
   ]);
 })();

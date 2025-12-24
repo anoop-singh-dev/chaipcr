@@ -245,7 +245,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                 sample2_name = 'No Template Control';
             } else {
                 target2_name = 'IPC';
-                sample2_name = 'Negative Control';
+                sample2_name = '';
             }
 
             $scope.wells = [
