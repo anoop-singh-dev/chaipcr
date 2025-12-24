@@ -250,7 +250,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
 
             $scope.wells = [
                 {'well_num':1,'well_type':'positive_control','sample_name':'Positive Control','notes':'','targets':['','']},
-                {'well_num':2,'well_type':'no_template_control','sample_name':'','notes':'','targets':['','']},
+                {'well_num':2,'well_type':'sample','sample_name':'','notes':'','targets':['','']},
                 {'well_num':3,'well_type':'sample','sample_name':'','notes':'','targets':['','']},
                 {'well_num':4,'well_type':'sample','sample_name':'','notes':'','targets':['','']},
                 {'well_num':5,'well_type':'sample','sample_name':'','notes':'','targets':['','']},
@@ -287,21 +287,19 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                 });
 
                 // Negetive Control
-                if(sample2_name) {
-                tasks.push(function(cb) {
-                    Experiment.createSample(new_experiment_id,{name: sample2_name}).then(function(resp) {
-                        $scope.sample_negative_2 = resp.data.sample;
-                        Experiment.linkSample(new_experiment_id, $scope.sample_negative_2.id, { wells: [2] }).then(function (response) {                                
-                            cb(null, response.data.sample.samples_wells);
-                        }).catch(function(err) {
-                            cb(null, null);
-                        });
-                    }).catch(function(err) {                            
-                        cb(null, null);
-                    });
+                // tasks.push(function(cb) {
+                //     Experiment.createSample(new_experiment_id,{name: sample2_name}).then(function(resp) {
+                //         $scope.sample_negative_2 = resp.data.sample;
+                //         Experiment.linkSample(new_experiment_id, $scope.sample_negative_2.id, { wells: [2] }).then(function (response) {                                
+                //             cb(null, response.data.sample.samples_wells);
+                //         }).catch(function(err) {
+                //             cb(null, null);
+                //         });
+                //     }).catch(function(err) {                            
+                //         cb(null, null);
+                //     });
 
-                });
-               }
+                // });
 
                 // Target 1
                 tasks.push(function(cb) {
@@ -383,7 +381,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
             if($scope.selectedKit == 1 || ($scope.selectedKit == 2 && $scope.kit1.name == $scope.kit2.name )){
                 $scope.wells = [
                     {'well_num':1,'well_type':'positive_control','sample_name':'Positive Control','notes':'','targets':['','']},
-                    {'well_num':2,'well_type':'no_template_control','sample_name':'Negative Control','notes':'','targets':['','']},
+                    {'well_num':2,'well_type':'sample','sample_name':'','notes':'','targets':['','']},
                     {'well_num':3,'well_type':'sample','sample_name':'','notes':'','targets':['','']},
                     {'well_num':4,'well_type':'sample','sample_name':'','notes':'','targets':['','']},
                     {'well_num':5,'well_type':'sample','sample_name':'','notes':'','targets':['','']},
@@ -420,19 +418,19 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                     });
 
                     // Negetive Control
-                    tasks.push(function(cb) {
-                        Experiment.createSample(new_experiment_id,{name: 'Negative Control'}).then(function(resp) {
-                            $scope.sample_negative_2 = resp.data.sample;
-                            Experiment.linkSample(new_experiment_id, $scope.sample_negative_2.id, { wells: [2] }).then(function (response) {                                
-                                cb(null, response.data.sample.samples_wells);
-                            }).catch(function(err) {
-                                cb(null, null);
-                            });
-                        }).catch(function(err) {                            
-                            cb(null, null);
-                        });
+                    // tasks.push(function(cb) {
+                    //     Experiment.createSample(new_experiment_id,{name: 'Negative Control'}).then(function(resp) {
+                    //         $scope.sample_negative_2 = resp.data.sample;
+                    //         Experiment.linkSample(new_experiment_id, $scope.sample_negative_2.id, { wells: [2] }).then(function (response) {                                
+                    //             cb(null, response.data.sample.samples_wells);
+                    //         }).catch(function(err) {
+                    //             cb(null, null);
+                    //         });
+                    //     }).catch(function(err) {                            
+                    //         cb(null, null);
+                    //     });
 
-                    });
+                    // });
 
                     // Target 1
                     tasks.push(function(cb) {
@@ -443,10 +441,10 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                                 well_num: 1,
                                 well_type: 'positive_control'
                             };
-                            linkTargetName[1] = {
-                                well_num: 2,
-                                well_type: 'negative_control'
-                            };
+                            // linkTargetName[1] = {
+                            //     well_num: 2,
+                            //     well_type: 'negative_control'
+                            // };
 
                             Experiment.linkTarget(new_experiment_id, $scope.target_1.id, { wells: linkTargetName }).then(function (response) {                                
                                 cb(null, response);
@@ -467,10 +465,10 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                                 well_num: 1,
                                 well_type: 'positive_control'
                             };
-                            linkTargetName[1] = {
-                                well_num: 2,
-                                well_type: 'negative_control'
-                            };
+                            // linkTargetName[1] = {
+                            //     well_num: 2,
+                            //     well_type: 'negative_control'
+                            // };
                             Experiment.linkTarget(new_experiment_id, $scope.target_ipc.id, { wells: linkTargetName }).then(function (response) {                                
                                 cb(null, response);
                             }).catch(function(err) {
@@ -506,7 +504,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                 var target1_kit2_name = ($scope.kit2.target_name) ? $scope.kit2.target_name : $scope.kit2.name;
                 $scope.wells = [
                     {'well_num':1,'well_type':'positive_control','sample_name':'Positive Control','notes':'','targets':[$scope.kit1.name,'']},
-                    {'well_num':2,'well_type':'no_template_control','sample_name':'Negative Control','notes':'','targets':[$scope.kit1.name,'']},
+                    {'well_num':2,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
                     {'well_num':3,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
                     {'well_num':4,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
                     {'well_num':5,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
@@ -514,7 +512,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                     {'well_num':7,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
                     {'well_num':8,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit1.name,'']},
                     {'well_num':9,'well_type':'sample','sample_name':'Positive Control','notes':'','targets':[$scope.kit2.name,'']},
-                    {'well_num':10,'well_type':'sample','sample_name':'Negative Control','notes':'','targets':[$scope.kit2.name,'']},
+                    {'well_num':10,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
                     {'well_num':11,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
                     {'well_num':12,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
                     {'well_num':13,'well_type':'sample','sample_name':'','notes':'','targets':[$scope.kit2.name,'']},
@@ -542,19 +540,19 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                     });
 
                     // Negetive Control 2
-                    tasks.push(function(cb) {
-                        Experiment.createSample(new_experiment_id,{name: 'Negative Control'}).then(function(resp) {
-                            $scope.sample_negative_2 = resp.data.sample;
-                            Experiment.linkSample(new_experiment_id, $scope.sample_negative_2.id, { wells: [2] }).then(function (response) {                                
-                                cb(null, response.data.sample.samples_wells);
-                            }).catch(function(err) {
-                                cb(null, null);
-                            });
-                        }).catch(function(err) {                            
-                            cb(null, null);
-                        });
+                    // tasks.push(function(cb) {
+                    //     Experiment.createSample(new_experiment_id,{name: 'Negative Control'}).then(function(resp) {
+                    //         $scope.sample_negative_2 = resp.data.sample;
+                    //         Experiment.linkSample(new_experiment_id, $scope.sample_negative_2.id, { wells: [2] }).then(function (response) {                                
+                    //             cb(null, response.data.sample.samples_wells);
+                    //         }).catch(function(err) {
+                    //             cb(null, null);
+                    //         });
+                    //     }).catch(function(err) {                            
+                    //         cb(null, null);
+                    //     });
 
-                    });
+                    // });
 
 
                     // Positive Control 9
@@ -573,19 +571,19 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                     });
 
                     // Negetive Control 10
-                    tasks.push(function(cb) {
-                        Experiment.createSample(new_experiment_id,{name: 'Negative Control'}).then(function(resp) {
-                            $scope.sample_negative_10 = resp.data.sample;
-                            Experiment.linkSample(new_experiment_id, $scope.sample_negative_10.id, { wells: [10] }).then(function (response) {                                
-                                cb(null, response.data.sample.samples_wells);
-                            }).catch(function(err) {
-                                cb(null, null);
-                            });
-                        }).catch(function(err) {                            
-                            cb(null, null);
-                        });
+                    // tasks.push(function(cb) {
+                    //     Experiment.createSample(new_experiment_id,{name: 'Negative Control'}).then(function(resp) {
+                    //         $scope.sample_negative_10 = resp.data.sample;
+                    //         Experiment.linkSample(new_experiment_id, $scope.sample_negative_10.id, { wells: [10] }).then(function (response) {                                
+                    //             cb(null, response.data.sample.samples_wells);
+                    //         }).catch(function(err) {
+                    //             cb(null, null);
+                    //         });
+                    //     }).catch(function(err) {                            
+                    //         cb(null, null);
+                    //     });
 
-                    });
+                    // });
 
 
                     // Target 1
@@ -597,10 +595,10 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                                 well_num: 1,
                                 well_type: 'positive_control'
                             };
-                            linkTargetName[1] = {
-                                well_num: 2,
-                                well_type: 'negative_control'
-                            };
+                            // linkTargetName[1] = {
+                            //     well_num: 2,
+                            //     well_type: 'negative_control'
+                            // };
 
                             Experiment.linkTarget(new_experiment_id, $scope.target_1.id, { wells: linkTargetName }).then(function (target1LinkResp) {
 
@@ -612,10 +610,10 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                                         well_num: 9,
                                         well_type: 'positive_control'
                                     };
-                                    linkTargetName[1] = {
-                                        well_num: 10,
-                                        well_type: 'negative_control'
-                                    };
+                                    // linkTargetName[1] = {
+                                    //     well_num: 10,
+                                    //     well_type: 'negative_control'
+                                    // };
 
                                     Experiment.linkTarget(new_experiment_id, $scope.target_2.id, { wells: linkTargetName }).then(function (target2LinkResp) {
 
@@ -627,18 +625,18 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
                                                 well_num: 1,
                                                 well_type: 'positive_control'
                                             };
-                                            linkTargetName[1] = {
-                                                well_num: 2,
-                                                well_type: 'negative_control'
-                                            };
+                                            // linkTargetName[1] = {
+                                            //     well_num: 2,
+                                            //     well_type: 'negative_control'
+                                            // };
                                             linkTargetName[2] = {
                                                 well_num: 9,
                                                 well_type: 'positive_control'
                                             };
-                                            linkTargetName[3] = {
-                                                well_num: 10,
-                                                well_type: 'negative_control'
-                                            };
+                                            // linkTargetName[3] = {
+                                            //     well_num: 10,
+                                            //     well_type: 'negative_control'
+                                            // };
                                             Experiment.linkTarget(new_experiment_id, $scope.target_ipc.id, { wells: linkTargetName }).then(function (response) {
                                                 cb(null, response);
                                             }).catch(function(err) {
