@@ -406,8 +406,15 @@ limitations under the License.
                 </td>
                 <td class="CB4 item-right" style="border-top-right-radius: 3px; border-bottom-right-radius: 3px;">
                   <span
+                    ng-if="hasPositiveResult(well_item) === null"
+                    style="color: orange; font-weight: bold;"
+                  >
+                    INVALID
+                  </span>
+                  <span
+                    ng-if="hasPositiveResult(well_item) !== null"
                     ng-style="{ 
-                      'color': hasPositiveResult(well_item) ? 'green' : 'red',
+                      'color': hasPositiveResult(well_item) ? 'green' : 'red', 
                       'font-weight': 'bold'
                     }"
                   >

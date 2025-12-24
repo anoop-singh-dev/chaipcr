@@ -34,7 +34,7 @@
             <tr ng-if="x && (x.name != '' && x.name != 'empty') && ((twoKits && $index < 8) || !twoKits)" 
               ng-repeat="x in samples track by $index">
               <td ng-if="$index < 8">A{{$index + 1}}</td>
-              <td ng-if="$index >= 8">B{{$index - 7}}</td>
+              <td ng-if="$index >= 8">B{{$index - 7}}</td> 
               <td class="CB2-M">{{x.name}}</td>
             
               <!-- <td ng-if="$index < 2" class="text-center">
@@ -49,13 +49,17 @@
                 <img ng-show="result[$index] == 'Invalid'" style="width:20px"  src="/images/Invalid.svg">
               </td> -->
               
-              <td style="white-space: nowrap;" ng-if="famCq[$index] >= 15" >
-                <span style="color: #00AA00; font-weight: bold;">Positive</span>
+              <td style="white-space: nowrap;">
+                <span ng-style="{'color': getResultColor($index), 'font-weight': 'bold'}">
+                  {{getResultStatus($index)}}
+                </span>
               </td>
-              <td style="white-space: nowrap;" ng-if="famCq[$index] < 15">
-                <span style="color: #FF0000; font-weight: bold;">Negative</span>
+               <!-- Updated Cq Column - only show if not INVALID and result is positive -->
+              <td class="text-center">
+                <span ng-show="getResultStatus($index) !== 'INVALID' && famCq[$index] && famCq[$index] >= 15">
+                  {{famCq[$index] | round:2}}
+                </span>
               </td>
-              <td class="text-center"><span ng-show="famCq[$index] && famCq[$index] >= 15">{{famCq[$index] | round:2}}</span></td>
               <!-- <td class="text-center" style="white-space: nowrap;">{{amount[$index]}}</td> -->
               <td ng-if="(x.id && x.notes) || (x.sample_data && x.sample_data.id && x.sample_data.notes)" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
                 <img style="width:20px" src="/images/dynexp/pika-test/note-on.svg" class="cursor-pointer note-{{$index}}">

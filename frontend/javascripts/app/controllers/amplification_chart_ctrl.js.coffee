@@ -900,8 +900,24 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.showAmpliChart = false
           $scope.showStandardChart = false
 
-      # Add hasPositiveResult here at the end
+      # Add this function near the other helper functions (around line 840)
+      $scope.isA1Invalid = ->
+        # Check if well A1 (index 0) has a negative result
+        if $scope.simple_well_data && $scope.simple_well_data.length > 0
+          a1_well = $scope.simple_well_data[0]  # A1 is the first well
+          if a1_well && a1_well.targets
+            for target in a1_well.targets
+              if $scope.targetsSetHided[target.target_id] && target.cq > 0 && target.cq <= 15
+                # A1 has at least one target with Cq <= 15 (negative)
+                return true
+        return false
+
+      # Update the hasPositiveResult function (around line 840)
       $scope.hasPositiveResult = (well_item) ->
+        # First check if A1 is invalid
+        if $scope.isA1Invalid()
+          return null  # Return null to indicate invalid state
+          
         return false if !well_item.targets
 
         for target in well_item.targets
