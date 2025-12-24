@@ -49,9 +49,13 @@
                 <img ng-show="result[$index] == 'Invalid'" style="width:20px"  src="/images/Invalid.svg">
               </td> -->
               
-              <td style="white-space: nowrap;" ng-if="famCq[$index] >= 12">Positive</td>
-              <td style="white-space: nowrap;" ng-if="famCq[$index] < 12">Negative</td>
-              <td class="text-center"><span ng-show="famCq[$index] && famCq[$index] >= 12">{{famCq[$index] | round:2}}</span></td>
+              <td style="white-space: nowrap;" ng-if="famCq[$index] >= 15" >
+                <span style="color: #00AA00; font-weight: bold;">Positive</span>
+              </td>
+              <td style="white-space: nowrap;" ng-if="famCq[$index] < 15">
+                <span style="color: #FF0000; font-weight: bold;">Negative</span>
+              </td>
+              <td class="text-center"><span ng-show="famCq[$index] && famCq[$index] >= 15">{{famCq[$index] | round:2}}</span></td>
               <!-- <td class="text-center" style="white-space: nowrap;">{{amount[$index]}}</td> -->
               <td ng-if="(x.id && x.notes) || (x.sample_data && x.sample_data.id && x.sample_data.notes)" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
                 <img style="width:20px" src="/images/dynexp/pika-test/note-on.svg" class="cursor-pointer note-{{$index}}">

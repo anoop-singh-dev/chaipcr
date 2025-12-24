@@ -905,7 +905,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         return false if !well_item.targets
 
         for target in well_item.targets
-          if $scope.targetsSetHided[target.target_id] and target.cq > 12
+          if $scope.targetsSetHided[target.target_id] and target.cq > 15
             return true
 
         return false

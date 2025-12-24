@@ -32,7 +32,7 @@ window.ChaiBioTech.ngApp.controller('CreateTestKitModalCtrl', [
             {
                 name: "pika",
                 guid: 'pika_4e_kit',
-                logo: '/images/SalivIQ_Strep_A_Logo.png', 
+                logo: '/images/SalivIQ_Logo.png', 
             },
         ];
 

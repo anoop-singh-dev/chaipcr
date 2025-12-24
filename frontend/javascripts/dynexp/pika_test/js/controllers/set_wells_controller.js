@@ -34,9 +34,9 @@
       $scope.initial_done = false;
       $scope.start_confirm_show = false;
       $scope.omit_positive_help = false;
-      $scope.omit_negative_help = false;
+      // $scope.omit_negative_help = false;
       $scope.omit_positive = false;
-      $scope.omit_negative = false;
+      // $scope.omit_negative = false;
       $scope.current_well_index = -1;
       $scope.original_sample_name = '';
       $scope.is_two_kit = false;
@@ -132,7 +132,7 @@
                 }
 
                 $scope.omit_positive = (resp.data[0].targets && resp.data[0].targets[0].well_type == 'positive_control') ? false : true;
-                $scope.omit_negative = (resp.data[1].targets && resp.data[1].targets[0].well_type == 'negative_control') ? false : true;
+                // $scope.omit_negative = (resp.data[1].targets && resp.data[1].targets[0].well_type == 'negative_control') ? false : true;
                 $scope.is_loading = false;
               });
             });
@@ -190,11 +190,11 @@
                 }
               }
 
-              if(!$scope.omit_negative){
-                if(index == 1){
-                  well_type = 'negative_control';
-                }
-              }
+              // if(!$scope.omit_negative){
+              //   if(index == 1){
+              //     well_type = 'negative_control';
+              //   }
+              // }
 
               Experiment.linkTarget($scope.experimentId, $scope.targets[0].id, { wells: [{ well_num: index + 1, well_type: well_type }] }).then(function (response) {
                 $scope.well_types[index] = well_type;
@@ -243,11 +243,11 @@
                   }
                 }
 
-                if(!$scope.omit_negative){
-                  if(index == 1){
-                    well_type = 'negative_control';
-                  }
-                }
+                // if(!$scope.omit_negative){
+                //   if(index == 1){
+                //     well_type = 'negative_control';
+                //   }
+                // }
                 Experiment.linkTarget($scope.experimentId, $scope.targets[1].id, { wells: [{ well_num: index + 9, well_type: well_type }] }).then(function (response) {
                   $scope.well_types[index + 8] = well_type;
                 });
@@ -340,28 +340,34 @@
         assignControlSample(true);
       };
 
-      $scope.omitNegative = function(){
-        assignControlSample(false);
-      };
+      // $scope.omitNegative = function(){
+      //   assignControlSample(false);
+      // };
 
       function assignControlSample(is_positive){
         var omit_control = false;
         var omit_sample_index = 0;
         var omit_sample_name = 'Positive Control';
         var omit_well_type = 'positive_control';
-        if(is_positive){
-          $scope.omit_positive = !$scope.omit_positive;
-          omit_control = $scope.omit_positive;
-          omit_sample_index = 0;
-          omit_sample_name = 'Positive Control';
-          omit_well_type = 'positive_control';
-        } else {
-          $scope.omit_negative = !$scope.omit_negative;
-          omit_control = $scope.omit_negative;
-          omit_sample_index = 1;
-          omit_sample_name = 'Negative Control';
-          omit_well_type = 'negative_control';
-        }
+
+        $scope.omit_positive = !$scope.omit_positive;
+        omit_control = $scope.omit_positive;
+        omit_sample_index = 0;
+        omit_sample_name = 'Positive Control';
+        omit_well_type = 'positive_control';
+        // if(is_positive){
+        //   $scope.omit_positive = !$scope.omit_positive;
+        //   omit_control = $scope.omit_positive;
+        //   omit_sample_index = 0;
+        //   omit_sample_name = 'Positive Control';
+        //   omit_well_type = 'positive_control';
+        // } else {
+        //   $scope.omit_negative = !$scope.omit_negative;
+        //   omit_control = $scope.omit_negative;
+        //   omit_sample_index = 1;
+        //   omit_sample_name = 'Negative Control';
+        //   omit_well_type = 'negative_control';
+        // }
 
         if(omit_control){
           if($scope.samples[omit_sample_index].id){
@@ -420,15 +426,17 @@
 
       $scope.isControlWell = function(sample, index, well_row){
         var type_index = (well_row == 'A') ? index : index + 8;
-        return ($scope.well_types[type_index] == 'positive_control' || $scope.well_types[type_index] == 'negative_control');
+        // return ($scope.well_types[type_index] == 'positive_control' || $scope.well_types[type_index] == 'negative_control');
+         return ($scope.well_types[type_index] == 'positive_control');
       };
 
       $scope.learnMoreClick = function(is_positive){
-        if(is_positive){
-          $scope.omit_negative_help = false; $scope.omit_positive_help = !$scope.omit_positive_help;
-        } else {
-          $scope.omit_positive_help = false; $scope.omit_negative_help = !$scope.omit_negative_help;
-        }
+        $scope.omit_positive_help = !$scope.omit_positive_help;
+        // if(is_positive){
+        //   $scope.omit_negative_help = false; $scope.omit_positive_help = !$scope.omit_positive_help;
+        // } else {
+        //   $scope.omit_positive_help = false; $scope.omit_negative_help = !$scope.omit_negative_help;
+        // }
       };
     }
   ]);
