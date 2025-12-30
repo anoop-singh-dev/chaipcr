@@ -249,37 +249,48 @@
       $scope.isA1Invalid = function() {
         if ($scope.famCq && $scope.famCq.length > 0) {
           var a1Cq = $scope.famCq[0];
-          if (a1Cq && a1Cq > 0 && a1Cq < 15) {
+          // A1 is invalid if: no Cq value OR Cq < 15
+          if (!a1Cq || a1Cq <= 0 || a1Cq < 15) {
             return true;
           }
         }
         return false;
       };
-
-      $scope.getResultStatus = function(index) {
+      
+      $scope.getResultStatus = function(index) { 
+        // If A1 (positive control) is invalid, ALL wells are INVALID
         if ($scope.isA1Invalid()) {
           return 'INVALID';
         }
         
+        // Normal logic for when A1 is valid
+        // For well A1 (index 0): if it has valid Cq >= 15, it's POSITIVE
+        if (index === 0 && $scope.famCq[0] && $scope.famCq[0] >= 15) {
+          return 'POSITIVE';
+        }
+        
+        // For all other wells: Cq >= 15 means POSITIVE, Cq < 15 means NEGATIVE
         if ($scope.famCq[index] && $scope.famCq[index] >= 15) {
           return 'POSITIVE';
-        } else if ($scope.famCq[index] && $scope.famCq[index] < 15) {
+        } else if ($scope.famCq[index] && $scope.famCq[index] > 0 && $scope.famCq[index] < 15) {
           return 'NEGATIVE';
         }
+        
         return '';
       };
+      
       $scope.getResultColor = function(index) {
         var status = $scope.getResultStatus(index);
         if (status === 'INVALID') {
-          return 'orange';
+          return 'orange';  // Orange for invalid results
         } else if (status === 'POSITIVE') {
-          return '#00AA00';
+          return '#00AA00';  // Green for positive
         } else if (status === 'NEGATIVE') {
-          return '#FF0000';
+          return '#FF0000';  // Red for negative
         }
-        return '#000000';
+        return '#000000';  // Black default
       };
-
+ 
     }
   ]);
 })();
