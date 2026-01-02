@@ -899,42 +899,67 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         else
           $scope.showAmpliChart = false
           $scope.showStandardChart = false
-
+      
       # Check if A1 positive control is invalid
       $scope.isA1Invalid = ->    
-        console.log "Checking A1 invalidity..."    
-        console.log "simple_well_data:", $scope.simple_well_data    
+        if !$scope.simple_well_data || $scope.simple_well_data.length == 0
+          return false
+          
+        a1_well = $scope.simple_well_data[0]  # A1 is always first well
         
-        if $scope.simple_well_data && $scope.simple_well_data.length > 0    
-          a1_well = $scope.simple_well_data[0]    
-          console.log "A1 well:", a1_well    
-          if a1_well && a1_well.targets    
-            for target in a1_well.targets    
-              console.log "Target:", target, "assigned:", target.assigned, "cq:", target.cq    
-              if target.assigned && (!target.cq || target.cq < 15)    
-                console.log "A1 is invalid - target cq:", target.cq    
-                return true    
+        if !a1_well || !a1_well.targets
+          return false
+        
+        # Check only non-IPC targets in A1
+        for target in a1_well.targets
+          continue if !target.assigned  # Skip unassigned targets
+          
+          # Find the actual target info to check if it's IPC
+          target_info = _.find $scope.targetsSet, (t) -> t.id == target.target_id
+          continue if target_info && target_info.name == 'IPC'  # Skip IPC
+          
+          # If assigned and (no cq OR cq < 15), then INVALID
+          if !target.cq || target.cq < 15
+            return true
+        
         return false
 
-      # Update the hasPositiveResult function
+      # Update the hasPositiveResult function (SEPARATE function, not inside isA1Invalid)
       $scope.hasPositiveResult = (well_item) ->
-        console.log "Checking if A1 is invalid..."
-        # First check if A1 is invalid - if so, all wells are invalid
+        # First check if we have data
         return null if !$scope.simple_well_data || $scope.simple_well_data.length == 0  
 
-        console.log "Checking if A1 is invalid..."
-
+        # Check if A1 positive control is invalid
         if $scope.isA1Invalid()
-          return null  # Return null to indicate invalid state (will show orange "INVALID")
+          return null  # Return null = INVALID (orange)
           
-        return false if !well_item.targets
+        # Check if this well has targets
+        return null if !well_item.targets
 
-        # Normal logic when A1 is valid
+        # Check each target (excluding IPC) for result
+        hasValidTarget = false
         for target in well_item.targets
-            if target.cq && target.cq >= 15
-              return true  # POSITIVE
+          continue if !target.assigned  # Skip unassigned targets
+          
+          # Find target info to check if it's IPC
+          target_info = _.find $scope.targetsSet, (t) -> t.id == target.target_id
+          continue if target_info && target_info.name == 'IPC'  # Skip IPC
+          
+          hasValidTarget = true
+          
+          # If target has Cq >= 15, it's POSITIVE
+          if target.cq && target.cq >= 15
+            return true  # POSITIVE (green)
+          
+          # If target has valid Cq < 15, it's NEGATIVE
+          if target.cq && target.cq > 0 && target.cq < 15
+            return false  # NEGATIVE (red)
 
-        return false  # NEGATIVE
+        # If no valid targets were found, return null (INVALID)
+        return null if !hasValidTarget
+        
+        # If we have valid targets but no Cq values, return null (INVALID)
+        return null
 
       $scope.$on '$destroy', ->
         $interval.cancel(retryInterval) if retryInterval
