@@ -902,27 +902,15 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
       # Check if A1 positive control is invalid
       $scope.isA1Invalid = ->
-        console.log('DEBUG: Checking A1 validity')
-        console.log('simple_well_data:', $scope.simple_well_data)
-        
+        # Check if well A1 (well_num = 1) has invalid results
         if $scope.simple_well_data && $scope.simple_well_data.length > 0
-          a1_well = $scope.simple_well_data[0]
-          console.log('A1 well:', a1_well)
-          
+          a1_well = $scope.simple_well_data[0]  # A1 is the first well
           if a1_well && a1_well.targets
-            console.log('A1 targets:', a1_well.targets)
-            
             for target in a1_well.targets
-              console.log('Checking target:', target)
-              
-              if target.assigned && target.target_name != 'IPC'
-                console.log('Target is non-IPC and assigned')
-                console.log('Cq value:', target.cq)
-                console.log('Is invalid?', !target.cq || target.cq <= 0 || target.cq < 15)
-                
+              # Check if target is not IPC and has Cq value
+                # A1 is invalid if: no Cq value OR Cq < 15
                 if !target.cq || target.cq <= 0 || target.cq < 15
                   return true
-                  
         return false
 
       # Update the hasPositiveResult function
@@ -935,8 +923,6 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
 
         # Normal logic when A1 is valid
         for target in well_item.targets
-          # Skip IPC targets
-          if target.target_name != 'IPC' && $scope.targetsSetHided[target.target_id]
             if target.cq && target.cq >= 15
               return true  # POSITIVE
 
