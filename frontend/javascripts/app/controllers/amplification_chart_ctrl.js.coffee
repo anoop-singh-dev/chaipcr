@@ -924,7 +924,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         
         return false
 
-      # Update the hasPositiveResult function (SEPARATE function, not inside isA1Invalid)
+      # Update the hasPositiveResult function 
       $scope.hasPositiveResult = (well_item) ->
         # First check if we have data
         return null if !$scope.simple_well_data || $scope.simple_well_data.length == 0  
@@ -959,7 +959,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
         return null if !hasValidTarget
         
         # If we have valid targets but no Cq values, return null (INVALID)
-        return null
+        return undefined
 
       $scope.$on '$destroy', ->
         $interval.cancel(retryInterval) if retryInterval
