@@ -440,7 +440,7 @@ limitations under the License.
                     <span class="CB4" ng-show="!isA1Invalid() && well_target.cq > 15">
                       {{well_target.cq | round:2}}
                     </span>
-                    <span class="CB4" ng-show="isA1Invalid() && well_target.cq <= 15">
+                    <span class="CB4" ng-show="isA1Invalid() || well_target.cq <= 15">
                       <span class="CB4 dummy-placeholder">&nbsp;</span>
                     </span>
                   </span>
