@@ -901,21 +901,20 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           $scope.showStandardChart = false
 
       # Check if A1 positive control is invalid
-    $scope.isA1Invalid = ->  
-      console.log "Checking A1 invalidity..."  
-      console.log "simple_well_data:", $scope.simple_well_data  
-
-      if $scope.simple_well_data && $scope.simple_well_data.length > 0  
-        a1_well = $scope.simple_well_data[0]  
-        console.log "A1 well:", a1_well  
-        if a1_well && a1_well.targets  
-          for target in a1_well.targets 
-           console.log "Target:", target   
-            # Only check assigned targets  
-            if target.assigned && (!target.cq || target.cq < 15)  
-             console.log "A1 is invalid - target cq:", target.cq  
-              return true  
-      return false
+      $scope.isA1Invalid = ->    
+        console.log "Checking A1 invalidity..."    
+        console.log "simple_well_data:", $scope.simple_well_data    
+        
+        if $scope.simple_well_data && $scope.simple_well_data.length > 0    
+          a1_well = $scope.simple_well_data[0]    
+          console.log "A1 well:", a1_well    
+          if a1_well && a1_well.targets    
+            for target in a1_well.targets    
+              console.log "Target:", target, "assigned:", target.assigned, "cq:", target.cq    
+              if target.assigned && (!target.cq || target.cq < 15)    
+                console.log "A1 is invalid - target cq:", target.cq    
+                return true    
+        return false
 
       # Update the hasPositiveResult function
       $scope.hasPositiveResult = (well_item) ->
