@@ -272,7 +272,7 @@
         // For all other wells: Cq >= 15 means POSITIVE, Cq < 15 means NEGATIVE
         if ($scope.famCq[index] && $scope.famCq[index] >= 15) {
           return 'POSITIVE';
-        } else if ($scope.famCq[index] && $scope.famCq[index] > 0 && $scope.famCq[index] < 15) {
+        } else if (($scope.famCq[index] && $scope.famCq[index] > 0 && $scope.famCq[index] < 15) || ($scope.famCq[index] === null)) {
           return 'NEGATIVE';
         }
         
