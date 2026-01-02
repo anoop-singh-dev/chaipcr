@@ -919,6 +919,10 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
       # Update the hasPositiveResult function
       $scope.hasPositiveResult = (well_item) ->
         # First check if A1 is invalid - if so, all wells are invalid
+        return null if !$scope.simple_well_data || $scope.simple_well_data.length == 0  
+
+        console.log "Checking if A1 is invalid..."
+        
         if $scope.isA1Invalid()
           return null  # Return null to indicate invalid state (will show orange "INVALID")
           
