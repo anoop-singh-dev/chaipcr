@@ -365,9 +365,9 @@ limitations under the License.
                 <th class="CB4-M item-center" width="50px" >Well</th>
                 <th class="CB4-M resizable" width="240px" ><span class="one-line-span">Sample</span></th>
                 <th class="CB4-M item-blank" width="100px" >Test Result</th>
-                <th class="CB4-M item-right target-header resizable" width="105px" >
+                <!-- <th class="CB4-M item-right target-header resizable" width="105px" >
                   <span class="one-line-span" ng-attr-style="background-color: {{color_by == 'target' ? target.color : 'transparent'}};">C<sub>q</sub></span>
-                </th>
+                </th> -->
               </tr>
             </thead>
             <tbody>
@@ -411,17 +411,23 @@ limitations under the License.
                   >
                     INVALID
                   </span>
-                  <span
-                    ng-if="hasPositiveResult(well_item) !== null"
-                    ng-style="{ 
-                      'color': hasPositiveResult(well_item) ? 'green' : 'red', 
-                      'font-weight': 'bold'
-                    }"
-                  >
-                    {{ hasPositiveResult(well_item) ? 'POSITIVE' : 'NEGATIVE' }}
-                  </span>
+              <!-- VALID case (A1 positive control) -->
+                <span ng-if="hasPositiveResult(well_item) === 'VALID'"style="color: black; font-weight: bold;">
+                 VALID
+                </span>
+
+                <!-- POSITIVE/NEGATIVE cases -->
+                <span
+                  ng-if="hasPositiveResult(well_item) === true || hasPositiveResult(well_item) === false"
+                  ng-style="{ 
+                    'color': hasPositiveResult(well_item) ? 'green' : 'red', 
+                    'font-weight': 'bold'
+                  }"
+                >
+                  {{ hasPositiveResult(well_item) ? 'POSITIVE' : 'NEGATIVE' }}
+                </span>
                 </td>
-                <td 
+                <!-- <td 
                   class="CB4 item-right target-cell" 
                   ng-class="{
                     assigned: well_target.assigned, 
@@ -444,7 +450,7 @@ limitations under the License.
                       <span class="CB4 dummy-placeholder">&nbsp;</span>
                     </span>
                   </span>
-                </td>
+                </td> -->
               </tr>
             </tbody>
           </table>

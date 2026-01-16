@@ -266,7 +266,7 @@
         // Normal logic for when A1 is valid
         // For well A1 (index 0): if it has valid Cq >= 15, it's POSITIVE
         if (index === 0 && $scope.famCq[0] && $scope.famCq[0] >= 15) {
-          return 'POSITIVE';
+          return 'VALID';
         }
         
         // For all other wells: Cq >= 15 means POSITIVE, Cq < 15 means NEGATIVE
@@ -283,7 +283,11 @@
         var status = $scope.getResultStatus(index);
         if (status === 'INVALID') {
           return 'orange';  // Orange for invalid results
-        } else if (status === 'POSITIVE') {
+        } 
+        else if (status === 'VALID') {
+          return '#000000';  // black for valid
+        }
+        else if (status === 'POSITIVE') {
           return '#00AA00';  // Green for positive
         } else if (status === 'NEGATIVE') {
           return '#FF0000';  // Red for negative

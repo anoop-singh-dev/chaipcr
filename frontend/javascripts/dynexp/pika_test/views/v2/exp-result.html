@@ -26,7 +26,7 @@
               <td>{{result_header}}</td>
               <!-- <td style="width:35px"></td> -->
               <td style="width:150px; white-space: nowrap;">Result</td>
-              <td class="text-center" style="width:100px">C<sub>q</sub></td>
+              <!-- <td class="text-center" style="width:100px">C<sub>q</sub></td> -->
               <!-- <td class="text-center" style="width:150px">Quantity</td> -->
               <td style="width:50px"></td>
             </tr>
@@ -55,11 +55,11 @@
                 </span>
               </td>
                <!-- Updated Cq Column - only show if not INVALID and result is positive -->
-               <td class="text-center">
+               <!-- <td class="text-center">
                 <span ng-show="getResultStatus($index) !== 'INVALID' && getResultStatus($index) === 'POSITIVE' && famCq[$index] && famCq[$index] > 0">
                   {{famCq[$index] | round:2}}
                 </span> 
-              </td>
+              </td> -->
               <!-- <td class="text-center" style="white-space: nowrap;">{{amount[$index]}}</td> -->
               <td ng-if="(x.id && x.notes) || (x.sample_data && x.sample_data.id && x.sample_data.notes)" ng-click="openNotes($index, x)" class="notes-cursor text-right" style="width:50px">
                 <img style="width:20px" src="/images/dynexp/pika-test/note-on.svg" class="cursor-pointer note-{{$index}}">

@@ -923,43 +923,64 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
             return true
         
         return false
+      
+      # Check if this is the A1 well
+      $scope.isA1Well = (well_item) ->
+        return false if !$scope.simple_well_data || $scope.simple_well_data.length == 0
+        return $scope.simple_well_data[0] == well_item
 
-      # Update the hasPositiveResult function 
+
+       # Update the hasPositiveResult function 
       $scope.hasPositiveResult = (well_item) ->
-        # First check if we have data
-        return null if !$scope.simple_well_data || $scope.simple_well_data.length == 0  
+          # First check if we have data
+          return null if !$scope.simple_well_data || $scope.simple_well_data.length == 0  
 
-        # Check if A1 positive control is invalid
-        if $scope.isA1Invalid()
-          return null  # Return null = INVALID (orange)
+          # Check if A1 positive control is invalid
+          if $scope.isA1Invalid()
+            return null  # Return null = INVALID (orange)
           
-        # Check if this well has targets
-        return null if !well_item.targets
+          # Check if this is A1 well - if valid, return 'VALID' string
+          if $scope.isA1Well(well_item)
+            # Check A1 has valid targets with Cq >= 15
+            if well_item.targets
+              for target in well_item.targets
+                continue if !target.assigned
+                
+                target_info = _.find $scope.targetsSet, (t) -> t.id == target.target_id
+                continue if target_info && target_info.name == 'IPC'
+                
+                if target.cq && target.cq >= 15
+                  return 'VALID'  # Return string 'VALID' for A1
+            
+            return null  # A1 should have been valid if we got here
+            
+          # Check if this well has targets
+          return null if !well_item.targets
 
-        # Check each target (excluding IPC) for result
-        hasValidTarget = false
-        for target in well_item.targets
-          continue if !target.assigned  # Skip unassigned targets
-          
-          # Find target info to check if it's IPC
-          target_info = _.find $scope.targetsSet, (t) -> t.id == target.target_id
-          continue if target_info && target_info.name == 'IPC'  # Skip IPC
-          
-          hasValidTarget = true
-          
-          # If target has Cq >= 15, it's POSITIVE
-          if target.cq && target.cq >= 15
-            return true  # POSITIVE (green)
-          
-          # If target has valid Cq < 15, it's NEGATIVE
-          if target.cq && target.cq > 0 && target.cq < 15
-            return false  # NEGATIVE (red)
+          # Check each target (excluding IPC) for result
+          hasValidTarget = false
+          for target in well_item.targets
+            continue if !target.assigned  # Skip unassigned targets
+            
+            # Find target info to check if it's IPC
+            target_info = _.find $scope.targetsSet, (t) -> t.id == target.target_id
+            continue if target_info && target_info.name == 'IPC'  # Skip IPC
+            
+            hasValidTarget = true
+            
+            # If target has Cq >= 15, it's POSITIVE
+            if target.cq && target.cq >= 15
+              return true  # POSITIVE (green)
+            
+            # If target has valid Cq < 15, it's NEGATIVE
+            if target.cq && target.cq >= 0 && target.cq < 15
+              return false  # NEGATIVE (red)
 
-        # If no valid targets were found, return null (INVALID)
-        return null if !hasValidTarget
-        
-        # If we have valid targets but no Cq values, return null (INVALID)
-        return false
+          # If no valid targets were found, return null (INVALID)
+          return null if !hasValidTarget
+          
+          # If we have valid targets but no Cq values, return null (INVALID)
+          return null
 
       $scope.$on '$destroy', ->
         $interval.cancel(retryInterval) if retryInterval
