@@ -50,7 +50,7 @@ window.ChaiBioTech.ngApp.controller('SampleTargetCtrl', [
 
         Experiment.get({id: $stateParams.id}).then(function(response){
             $scope.experiment = response.experiment;
-            $rootScope.pageTitle = response.experiment.name + " | Open qPCR";
+            $rootScope.pageTitle = response.experiment.name + " | SalivIQ™ Analyzer";
         });
 
         Device.isDualChannel().then(function(is_dual_channel){

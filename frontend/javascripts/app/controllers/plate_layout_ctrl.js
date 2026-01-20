@@ -49,7 +49,7 @@ window.ChaiBioTech.ngApp.controller('PlateLayoutCtrl', [
 
 		Experiment.get({ id: $stateParams.id }).then(function (response) {
 			$scope.experiment = response.experiment;
-			$rootScope.pageTitle = response.experiment.name + " | Open qPCR";
+			$rootScope.pageTitle = response.experiment.name + " | SalivIQ™ Analyzer";
 			if($scope.experiment.standard_experiment_id){
 				Experiment.get({ id: $scope.experiment.standard_experiment_id }).then(function (resp) {
 					$scope.standard_experiment = resp.experiment;

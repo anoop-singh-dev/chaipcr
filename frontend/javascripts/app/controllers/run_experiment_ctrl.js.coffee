@@ -48,7 +48,7 @@ window.ChaiBioTech.ngApp.controller 'RunExperimentCtrl', [
 
     Experiment.get(id: $stateParams.id).then (data) ->
       $scope.experiment = data.experiment
-      $rootScope.pageTitle = data.experiment.name + " | Open qPCR"
+      $rootScope.pageTitle = data.experiment.name + " | SalivIQ™ Analyzer"
 
       if !hasChart($scope.chart)
         chart = null
