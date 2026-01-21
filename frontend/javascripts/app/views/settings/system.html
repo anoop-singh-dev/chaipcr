@@ -26,7 +26,8 @@
     <h3 class="wizard-header"></h3>
     <div class="wizard">
       <h3>Software Update Status</h3>
-      <p ng-if="data.software.version">v{{ data.software.version + " installed"}}</p>
+      <!-- <p ng-if="data.software.version">v{{ data.software.version + " installed"}}</p> -->
+      <p ng-if="data.software.version">v 1.0.0 installed</p>
 
       <button class="green-button" ng-show="update_available === 'unavailable' && !checkedUpdate && !checking_update" ng-click="checkUpdate()">
         CHECK FOR UPDATES
