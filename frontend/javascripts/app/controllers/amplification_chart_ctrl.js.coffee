@@ -980,7 +980,7 @@ window.ChaiBioTech.ngApp.controller 'AmplificationChartCtrl', [
           return null if !hasValidTarget
           
           # If we have valid targets but no Cq values, return null (INVALID)
-          return null
+          return false
 
       $scope.$on '$destroy', ->
         $interval.cancel(retryInterval) if retryInterval
